@@ -2,11 +2,15 @@
 using IdentityApp.Models;
 using IdentityApp.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using System;
 using System.Security.Claims;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace IdentityApp.Controllers
@@ -18,81 +22,274 @@ namespace IdentityApp.Controllers
         private readonly JWTService _jwtService;
         private readonly SignInManager<User> _signInManager;
         private readonly UserManager<User> _userManager;
+        private readonly EmailService _emailService;
+        private readonly IConfiguration _config;
 
-        public AccountController(JWTService jwtService,
+        public AccountController(
+            JWTService jwtService,
             SignInManager<User> signInManager,
-            UserManager<User> userManager)
+            UserManager<User> userManager,
+            EmailService emailService,
+            IConfiguration config)
         {
             _jwtService = jwtService;
             _signInManager = signInManager;
             _userManager = userManager;
-
+            _emailService = emailService;
+            _config = config;
         }
 
+        // ======================================================
+        // REFRESH TOKEN (GET USER INFO)
+        // ======================================================
         [Authorize]
         [HttpGet("refresh-user-token")]
         public async Task<ActionResult<UserDto>> RefreshUserToken()
         {
-            var user = await _userManager.FindByNameAsync(User.FindFirst(ClaimTypes.Email)?.Value);
+            var email = User.FindFirst(ClaimTypes.Email)?.Value;
+
+            if (email == null)
+                return Unauthorized("Invalid token");
+
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+                return Unauthorized("User not found");
+
             return CreateApplicationUserDto(user);
         }
 
+        // ======================================================
+        // LOGIN
+        // ======================================================
         [HttpPost("login")]
         public async Task<ActionResult<UserDto>> Login(LoginDto model)
         {
-            var user= await _userManager.FindByNameAsync(model.UserName);
-            if (user == null) return Unauthorized("Invalid username or password");
-            if (user.EmailConfirmed == false) return Unauthorized("Please confirm your email.");
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var user = await _userManager.FindByNameAsync(model.UserName);
+            if (user == null)
+                return Unauthorized("Invalid username or password");
+
+            if (!user.EmailConfirmed)
+                return Unauthorized("Please confirm your email.");
 
             var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, false);
-            if (!result.Succeeded) return Unauthorized("Invalid username or password");
+
+            if (!result.Succeeded)
+                return Unauthorized("Invalid username or password");
 
             return CreateApplicationUserDto(user);
-            
-
         }
 
+        // ======================================================
+        // REGISTER
+        // ======================================================
         [HttpPost("register")]
-
         public async Task<ActionResult> Register(RegisterDto model)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-            if(await CheckEmailExistsAsync(model.Email))
-            {
-                return BadRequest($"An existing account is using (model.Email),email address.Please try with another email address");
-            }
+            if (await CheckEmailExistsAsync(model.Email))
+                return BadRequest(new { message = "An account with this email already exists. Try logging in." });
+
             var userToAdd = new User
             {
                 FirstName = model.FirstName.ToLower(),
                 LastName = model.LastName.ToLower(),
                 UserName = model.Email.ToLower(),
                 Email = model.Email.ToLower(),
-                EmailConfirmed = true
             };
 
             var result = await _userManager.CreateAsync(userToAdd, model.Password);
-            if (!result.Succeeded) return BadRequest(result.Errors);
+            if (!result.Succeeded)
+                return BadRequest(result.Errors);
 
-            return Ok("Your account has been created, you can login");
+            try
+            {
+                if (await SendConfirmEmailAsync(userToAdd))
+                {
+                    return Ok(new
+                    {
+                        title = "Account Created",
+                        message = "Verification email sent. Please check your inbox."
+                    });
+                }
+
+                return BadRequest("Failed to send email. Please contact admin.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("EMAIL ERROR: " + ex.ToString());
+                return BadRequest("Email error: " + ex.Message);
+            }
+
         }
-        #region Private Helper Methods
+
+        [HttpPut("confirm-email")]
+        public async Task<ActionResult> ConfirmEmail([FromBody] ConfirmEmailDto model)
+        {
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+                return Unauthorized(new { message = "This email address is not registered." });
+
+            if (user.EmailConfirmed)
+                return BadRequest(new { message = "Your email is already confirmed. Please login." });
+
+            try
+            {
+                // Decode token
+                var decodedTokenBytes = WebEncoders.Base64UrlDecode(model.Token);
+                var decodedToken = Encoding.UTF8.GetString(decodedTokenBytes);
+
+                // Confirm email
+                var result = await _userManager.ConfirmEmailAsync(user, decodedToken);
+
+                if (result.Succeeded)
+                    return Ok(new { message = "Your email has been confirmed successfully!" });
+
+                return BadRequest(new { message = "Invalid token. Please try again." });
+            }
+            catch (Exception)
+            {
+                return BadRequest(new { message = "Invalid token. Please try again." });
+            }
+        }
+
+
+        [HttpPost("resend-email-confirmation-link/{email}")]
+        public async Task<ActionResult> ResendEMailConfirmationLink(string email)
+        {
+            if (string.IsNullOrEmpty(email)) return BadRequest("Invalid email");
+            var user = await _userManager.FindByEmailAsync(email);
+
+            if (user == null) return Unauthorized("This email adress has not been registered yet");
+            if(user.EmailConfirmed == true) return BadRequest("Your email address was confirmed before. Please login to you account");
+
+            try
+            {
+                if(await SendConfirmEmailAsync(user))
+                {
+                    return Ok(new JsonResult(new { title = "Confirmation link sent", message = "Please confirm your email address" }));
+                }
+                return BadRequest("Failed to send email. Please contact admin");
+            }
+            catch(Exception)
+            {
+                return BadRequest("Failed to send email. Please contact admin");
+            }
+        }
+
+        [HttpPost("forgot-username-or-password/{email}")]
+        public async Task<ActionResult> ForgotUsernameOrPassword(string email)
+        {
+            if (string.IsNullOrEmpty(email)) return BadRequest("Invalid email");
+            var user = await _userManager.FindByEmailAsync(email);
+
+            if (user == null) return Unauthorized("This email adress has not been registered yet");
+            if (user.EmailConfirmed == false) return BadRequest("Please confirm your email address first.");
+
+            try
+            {
+                if (await SendForgotUsernameOrPasswordEmail(user))
+                {
+                    return Ok(new JsonResult(new { title = "Forgot username or password email sent", message = "Please check your email" }));
+                }
+                return BadRequest("Failed to send email. Please contact admin");
+            }
+            catch (Exception)
+            {
+                return BadRequest("Failed to send email. Please contact admin");
+            }
+
+        }
+
+        // ======================================================
+        // VERIFY EMAIL
+        // ======================================================
+        //[HttpGet("verify-email")]
+        //public async Task<IActionResult> VerifyEmail([FromQuery] string token, [FromQuery] string email)
+        //{
+        //    var frontendUrl = _config["Frontend:Url"] ?? "http://localhost:4200";
+
+        //    if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(email))
+        //        return Redirect($"{frontendUrl}/email-verification-failed");
+
+        //    var user = await _userManager.FindByEmailAsync(email);
+        //    if (user == null)
+        //        return Redirect($"{frontendUrl}/email-verification-failed");
+
+        //    var decodedBytes = WebEncoders.Base64UrlDecode(token);
+        //    var normalToken = Encoding.UTF8.GetString(decodedBytes);
+
+        //    var result = await _userManager.ConfirmEmailAsync(user, normalToken);
+
+        //    if (result.Succeeded)
+        //        return Redirect($"{frontendUrl}/email-verified");
+
+        //    return Redirect($"{frontendUrl}/email-verification-failed");
+        //}
+
+        // ======================================================
+        // PRIVATE HELPERS
+        // ======================================================
         private UserDto CreateApplicationUserDto(User user)
         {
             return new UserDto
             {
                 FirstName = user.FirstName,
                 LastName = user.LastName,
-                JWT = _jwtService.CreateJWT(user),
-
-
+                JWT = _jwtService.CreateJWT(user)
             };
         }
 
         private async Task<bool> CheckEmailExistsAsync(string email)
         {
-            return await _userManager.Users.AnyAsync(x=>x.Email== email.ToLower());
+            return await _userManager.Users.AnyAsync(x => x.Email == email.ToLower());
         }
-        #endregion
 
+        private async Task<bool> SendConfirmEmailAsync(User user)
+        {
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+
+            var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+
+            var url = $"{_config["JWT:ClientUrl"]}/{_config["Email:ConfirmEmailPath"]}?token={encodedToken}&email={user.Email}";
+
+            var body = $@"
+                <html>
+                    <head><meta charset='UTF-8'></head>
+                    <body>
+                        <p>Hello {user.FirstName} {user.LastName},</p>
+                        <p>Please confirm your email by clicking the link below:</p>
+                        <p><a href=""{url}"">Confirm Email</a></p>
+                        <p>Thank you,<br>{_config["Email:ApplicationName"]}</p>
+                    </body>
+                </html>";
+
+            var emailSend = new EmailSendDto(user.Email, "Confirm Your Email", body);
+
+            return await _emailService.SendEmailAsync(emailSend);
+        }
+
+        private async Task<bool> SendForgotUsernameOrPasswordEmail(User user)
+        {
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            token = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+            var url = $"{_config["JWT:ClientUrl"]}/{_config["Email:ResetPasswordPath"]}?token={token}&email={user.Email}";
+
+            var body = $"<p>Hello:{user.FirstName}{user.LastName}</p>" +
+                $"<p> Username:{user.UserName}.</p>" +
+                "<p>In order to reset your password, please click on the following link.</p>" +
+                $"<p><a href=\"{url}\">Click here</a></p>" +
+                "<p> Thank You,</p>" +
+                $"<br>{_config["Email:ApplicationName"]}";
+
+            var emailSend = new EmailSendDto(user.Email, "Forgot username or password", body);
+
+            return await _emailService.SendEmailAsync(emailSend);
+
+        }
     }
 }

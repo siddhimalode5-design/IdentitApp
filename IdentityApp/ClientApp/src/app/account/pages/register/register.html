@@ -1,0 +1,87 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <h2>Create Account</h2>
+    <p>Join our secure identity platform</p>
+
+    <!-- Global API error (Backend string or summary errors) -->
+    <div class="error-box" *ngIf="serverError" [innerHTML]="serverError"></div>
+
+    <form [formGroup]="form" novalidate>
+
+      <!-- FIRST NAME -->
+      <div class="form-group">
+        <label>First Name</label>
+        <input pInputText formControlName="firstName" placeholder="First Name" />
+
+        <small *ngIf="get('firstName')?.touched && get('firstName')?.invalid">
+          First name must be at least 3 characters.
+        </small>
+
+        <!-- backend validation (normalized to camelCase) -->
+        <small class="api-error" *ngIf="fieldErrors.firstName">
+          {{ fieldErrors.firstName }}
+        </small>
+      </div>
+
+      <!-- LAST NAME -->
+      <div class="form-group">
+        <label>Last Name</label>
+        <input pInputText formControlName="lastName" placeholder="Last Name" />
+
+        <small *ngIf="get('lastName')?.touched && get('lastName')?.invalid">
+          Last name must be at least 3 characters.
+        </small>
+
+        <small class="api-error" *ngIf="fieldErrors.lastName">
+          {{ fieldErrors.lastName }}
+        </small>
+      </div>
+
+      <!-- EMAIL -->
+      <div class="form-group">
+        <label>Email</label>
+        <input pInputText type="email" formControlName="email" placeholder="Email address" />
+
+        <small *ngIf="get('email')?.touched && get('email')?.invalid">
+          Enter a valid email.
+        </small>
+
+        <small class="api-error" *ngIf="fieldErrors.email">
+          {{ fieldErrors.email }}
+        </small>
+      </div>
+
+      <!-- PASSWORD -->
+      <div class="form-group">
+        <label>Password</label>
+        <p-password formControlName="password" placeholder="Create password" [feedback]="true" [toggleMask]="true"></p-password>
+
+        <small *ngIf="get('password')?.touched && get('password')?.invalid">
+          Password must be at least 8 characters.
+        </small>
+      </div>
+
+      <!-- CONFIRM PASSWORD -->
+      <div class="form-group">
+        <label>Confirm Password</label>
+        <p-password formControlName="confirmPassword" placeholder="Confirm password" [feedback]="false" [toggleMask]="true"></p-password>
+
+        <small *ngIf="get('confirmPassword')?.touched && (get('password')?.value !== get('confirmPassword')?.value)">
+          Passwords do not match.
+        </small>
+      </div>
+
+      <!-- BUTTON: type="button" to prevent native submit behaviour -->
+      <button pButton type="button" label="Register" class="auth-btn" (click)="register()" [disabled]="form.invalid || loading"></button>
+
+      <div *ngIf="loading" style="margin-top:10px;">
+        <p>Processing... please wait.</p>
+      </div>
+
+      <p class="switch-text">
+        Already have an account?
+        <a (click)="goToLogin()">Login</a>
+      </p>
+    </form>
+  </div>
+</div>

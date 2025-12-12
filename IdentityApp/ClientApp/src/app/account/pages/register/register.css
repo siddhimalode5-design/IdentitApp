@@ -1,0 +1,117 @@
+.auth-container {
+  height: 100vh;
+  width: 100%;
+  background: url('../../../../assets/images/bg.jpg') no-repeat center center/cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.auth-card {
+  width: 380px;
+  padding: 30px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.25);
+  text-align: center;
+}
+
+h2 {
+  margin-bottom: 5px;
+  font-weight: 600;
+  color: #fff;
+}
+
+p {
+  color: #ddd;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  text-align: left;
+  margin-bottom: 18px;
+}
+
+label {
+  display: block;
+  color: #eee;
+  margin-bottom: 6px;
+}
+
+input {
+  width: 100%;
+}
+
+.auth-btn {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.switch-text {
+  color: #eee;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.switch-text a {
+  cursor: pointer;
+  color: #90caf9;
+}
+
+.social-btn {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.fb {
+  background-color: #1877f2;
+  color: white;
+}
+
+.ln {
+  background-color: #0a66c2;
+  color: white;
+}
+
+ 
+
+/* Force PrimeNG password wrapper full width */
+:host ::ng-deep .p-password {
+    width: 100% !important;
+    display: flex !important;
+}
+
+/* Make internal input full width */
+:host ::ng-deep .p-password .p-inputtext {
+    width: 100% !important;
+    flex: 1 !important;
+    box-sizing: border-box !important;
+}
+
+/* Remove automatic shrinking caused by toggle icon */
+:host ::ng-deep .p-password-input-wrapper {
+    width: 100% !important;
+    flex: 1 !important;
+}
+
+.error-box {
+  background: #ffe5e5;
+  color: #b30000;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+.api-error, small {
+  color: red !important;
+  font-size: 13px;
+  margin-top: 4px;
+  display: block;
+}
+
+
+
+
+

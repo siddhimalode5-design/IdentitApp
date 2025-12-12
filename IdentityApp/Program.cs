@@ -4,11 +4,14 @@ using IdentityApp.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using System;
+using System.Linq;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,11 +29,16 @@ builder.Services.AddDbContext<Context>(options =>
 );
 
 builder.Services.AddScoped<JWTService>();
+ 
+builder.Services.AddScoped<EmailService>();
+
+
+
 
 builder.Services.AddIdentityCore<User>(options =>
 {
     //password configuration
-    options.Password.RequiredLength = 8;
+    options.Password.RequiredLength = 6;
     options.Password.RequireDigit = false;
     options.Password.RequireLowercase = false;
     options.Password.RequireUppercase = false;
@@ -68,6 +76,44 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
 
     });
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngular",
+        policy =>
+        {
+            policy.WithOrigins(
+                "http://localhost:4200" // local Angular frontend
+                //"https://lucent-dragon-13b5ff.netlify.app", // Netlify frontend
+                //"https://pedodontic-fitfully-isidra.ngrok-free.dev" // your ngrok tunnel
+            )
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+        });
+});
+
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.InvalidModelStateResponseFactory = actionContext =>
+    {
+        var errors = actionContext.ModelState
+        .Where(X509EncryptingCredentials => X509EncryptingCredentials.Value.Errors.Count > 0)
+        .SelectMany(X509EncryptingCredentials => X509EncryptingCredentials.Value.Errors)
+        .Select(X509EncryptingCredentials => X509EncryptingCredentials.ErrorMessage).ToArray();
+
+        var toReturn = new
+        {
+            Errors = errors
+        };
+
+        return new BadRequestObjectResult(toReturn);
+    };
+});
+
+
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -77,11 +123,43 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+ 
 
+
+app.UseHttpsRedirection();
+app.UseCors("AllowAngular");
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.Lifetime.ApplicationStarted.Register(async () =>
+{
+    try
+    {
+        var apiKey = builder.Configuration["MailJet:ApiKey"];
+        var secret = builder.Configuration["MailJet:SecretKey"];
+
+        var client = new Mailjet.Client.MailjetClient(apiKey, secret);
+
+        Console.WriteLine("Testing MailJet...");
+
+        var request = new Mailjet.Client.MailjetRequest
+        {
+            Resource = Mailjet.Client.Resources.Contact.Resource
+        };
+
+        var response = await client.GetAsync(request);
+
+        Console.WriteLine("=== MAILJET RESPONSE START ===");
+        Console.WriteLine(response.GetData());
+        Console.WriteLine("=== MAILJET RESPONSE END ===");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("MailJet Error: " + ex.Message);
+    }
+});
+
+
 
 app.Run();

@@ -1,0 +1,26 @@
+<nav class="nav-container">
+  <div class="nav-left">
+    <h2 class="logo">IdentityApp</h2>
+  </div>
+
+  <div class="nav-right">
+
+    <!-- BEFORE LOGIN -->
+    <ng-container *ngIf="!isLoggedIn()">
+      <a routerLink="/" class="nav-link" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
+      <a routerLink="/login" class="nav-link" routerLinkActive="active">Login</a>
+      <a routerLink="/register" class="nav-link" routerLinkActive="active">Register</a>
+    </ng-container>
+
+    <!-- AFTER LOGIN -->
+    <ng-container *ngIf="isLoggedIn()">
+      <span class="nav-user">Hi, {{ user()?.firstName }}</span>
+
+      <a routerLink="/dashboard" class="nav-link" routerLinkActive="active">Dashboard</a>
+      <a routerLink="/profile" class="nav-link" routerLinkActive="active">Profile</a>
+
+      <button pButton class="logout-btn" label="Logout" (click)="logout()"></button>
+    </ng-container>
+
+  </div>
+</nav>
