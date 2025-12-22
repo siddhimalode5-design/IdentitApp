@@ -1,0 +1,142 @@
+<div class="surface-ground flex align-items-center justify-content-center min-h-screen">
+  <div class="surface-card p-4 shadow-2 border-round w-full sm:w-30rem">
+
+    <div class="text-center mb-4">
+      <h2 class="text-900 text-2xl font-medium mb-2">Create Account</h2>
+      <span class="text-600 font-medium">
+        Join our secure identity platform
+      </span>
+    </div>
+
+    <!-- Global backend error -->
+    <div class="p-error mb-3" *ngIf="serverError" [innerHTML]="serverError"></div>
+
+    <form [formGroup]="form" class="p-fluid">
+
+      <!-- FIRST NAME -->
+      <div class="field mb-3">
+        <label class="block text-900 mb-2">First Name</label>
+        <input pInputText formControlName="firstName" placeholder="First Name" />
+
+        <small class="p-error"
+  *ngIf="get('firstName')?.touched && get('firstName')?.errors?.['required']">
+  First name is required.
+</small>
+
+<small class="p-error"
+  *ngIf="get('firstName')?.touched && get('firstName')?.errors?.['minlength']">
+  First name must be at least 3 characters.
+</small>
+
+
+        <small class="p-error" *ngIf="fieldErrors.firstName">
+          {{ fieldErrors.firstName }}
+        </small>
+      </div>
+
+      <!-- LAST NAME -->
+      <div class="field mb-3">
+        <label class="block text-900 mb-2">Last Name</label>
+        <input pInputText formControlName="lastName" placeholder="Last Name" />
+
+       <small class="p-error"
+  *ngIf="get('lastName')?.touched && get('lastName')?.errors?.['required']">
+  last name is required.
+</small>
+
+<small class="p-error"
+  *ngIf="get('lastName')?.touched && get('lastName')?.errors?.['minlength']">
+  last name must be at least 3 characters.
+</small>
+
+
+        <small class="p-error" *ngIf="fieldErrors.lastName">
+          {{ fieldErrors.lastName }}
+        </small>
+      </div>
+
+      <!-- EMAIL -->
+      <div class="field mb-3">
+        <label class="block text-900 mb-2">Email</label>
+        <input pInputText type="email" formControlName="email" placeholder="Email address" />
+
+       <small class="p-error"
+  *ngIf="get('email')?.touched && get('email')?.errors?.['required']">
+ Email is required.
+</small>
+
+<small class="p-error"
+  *ngIf="get('email')?.touched && get('email')?.errors?.['minlength']">
+  Enter a valid email.
+</small>
+
+
+        <small class="p-error" *ngIf="fieldErrors.email">
+          {{ fieldErrors.email }}
+        </small>
+      </div>
+
+      <!-- PASSWORD -->
+      <div class="field mb-3">
+        <label class="block text-900 mb-2">Password</label>
+        <p-password
+          formControlName="password"
+          placeholder="Create password"
+          [feedback]="true"
+          [toggleMask]="true">
+        </p-password>
+<small class="p-error"
+  *ngIf="get('password')?.touched && get('password')?.errors?.['required']">
+ Password is required.
+</small>
+
+        <small class="p-error"
+  *ngIf="get('password')?.touched && get('password')?.errors?.['minlength']">
+  Password must be at least 8 characters.
+</small>
+      </div>
+
+      <!-- CONFIRM PASSWORD -->
+      <div class="field mb-4">
+        <label class="block text-900 mb-2">Confirm Password</label>
+        <p-password
+          formControlName="confirmPassword"
+          placeholder="Confirm password"
+          [feedback]="false"
+          [toggleMask]="true">
+        </p-password>
+
+        <small class="p-error"
+          *ngIf="get('confirmPassword')?.touched &&
+                  (get('password')?.value !== get('confirmPassword')?.value)">
+          Passwords do not match.
+        </small>
+      </div>
+
+      <!-- REGISTER BUTTON -->
+      <button
+        pButton
+        type="button"
+        label="Create Account"
+        class="w-full"
+        (click)="register()"
+        [disabled]="form.invalid || loading">
+      </button>
+
+      <div class="text-center mt-3" *ngIf="loading">
+        <i class="pi pi-spin pi-spinner"></i> Processing...
+      </div>
+
+      <div class="text-center mt-4">
+        <span class="text-600">
+          Already have an account?
+        </span>
+        <a class="font-medium no-underline ml-2 cursor-pointer text-primary hover:underline"
+           (click)="goToLogin()">
+          Login
+        </a>
+      </div>
+
+    </form>
+  </div>
+</div>

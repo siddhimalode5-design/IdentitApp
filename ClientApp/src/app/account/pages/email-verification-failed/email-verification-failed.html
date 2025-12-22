@@ -1,0 +1,21 @@
+<div class="failed-container">
+  <p-card class="failed-card">
+    <div class="icon-container">
+      <i class="pi pi-times-circle failed-icon"></i>
+    </div>
+
+    <h2 class="title">Email Verification Failed</h2>
+    <p class="message">
+      The verification link is invalid or expired.  
+      Please try registering again.
+    </p>
+
+    <p-divider></p-divider>
+
+    <button pButton 
+            label="Go to Register" 
+            class="p-button-danger p-button-rounded action-btn"
+            (click)="goToRegister()">
+    </button>
+  </p-card>
+</div>

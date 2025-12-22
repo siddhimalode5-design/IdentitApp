@@ -1,0 +1,46 @@
+.app-footer {
+  background-color: #f9fafb;
+  border-top: 1px solid #e5e7eb;
+  padding: 18px 0;
+  text-align: center;
+  color: #374151;
+  margin-top: 40px;
+  font-family: "Segoe UI", Roboto, sans-serif;
+}
+
+.footer-content {
+  margin-bottom: 6px;
+}
+
+.footer-brand {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #111827;
+  display: block;
+}
+
+.footer-desc {
+  color: #6b7280;
+  font-size: 0.90rem;
+}
+
+.footer-links {
+  margin: 8px 0;
+}
+
+.footer-link {
+  margin: 0 12px;
+  text-decoration: none;
+  color: #3b82f6;
+  font-weight: 500;
+}
+
+.footer-link:hover {
+  text-decoration: underline;
+  color: #2563eb;
+}
+
+.footer-copy {
+  font-size: 0.80rem;
+  color: #6b7280;
+}

@@ -1,0 +1,42 @@
+/* Make all inputs take full width */
+:host ::ng-deep input.p-inputtext {
+  width: 100%;
+}
+
+/* Fix PrimeNG password width */
+:host ::ng-deep .p-password {
+  width: 100%;
+}
+
+:host ::ng-deep .p-password input {
+  width: 100%;
+}
+
+/* Optional: better spacing */
+.field {
+  width: 100%;
+}
+/* Error text (red like Sakai) */
+:host ::ng-deep .p-error {
+  color: #e24c4c;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+/* Input border turns red when invalid */
+:host ::ng-deep .ng-invalid.ng-touched .p-inputtext,
+:host ::ng-deep .ng-invalid.ng-touched .p-password-input {
+  border-color: #e24c4c !important;
+}
+
+/* Password eye icon alignment stays clean */
+:host ::ng-deep .p-password {
+  width: 100%;
+}
+
+/* Small spacing so errors are visible */
+:host ::ng-deep .field small {
+  margin-top: 0.25rem;
+  display: block;
+}

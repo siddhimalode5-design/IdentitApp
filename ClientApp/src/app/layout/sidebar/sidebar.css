@@ -1,0 +1,27 @@
+.sidebar {
+  width: 250px;
+  min-height: calc(100vh - 60px);
+  background: white;
+  border-right: 1px solid #ddd;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 1rem;
+}
+
+.sidebar li {
+  padding: 0.75rem;
+  cursor: pointer;
+}
+
+.sidebar li.active {
+  background: #eef2ff;
+  border-radius: 6px;
+}
+
+.active {
+  font-weight: bold;
+  background-color: #eef2ff;
+  border-left: 4px solid #6366f1;
+}

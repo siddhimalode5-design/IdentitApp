@@ -1,0 +1,115 @@
+<div class="surface-ground flex align-items-center justify-content-center min-h-screen">
+    <div class="surface-card p-4 shadow-2 border-round w-full sm:w-30rem">
+
+        <div class="text-center mb-4">
+            <h2 class="text-900 font-medium text-2xl mb-2">Welcome Back</h2>
+            <span class="text-600">Sign in to continue</span>
+        </div>
+
+        <form [formGroup]="form" (ngSubmit)="login()" class="flex flex-column gap-3">
+
+            <div class="flex flex-column gap-1">
+                <label for="email" class="text-900 font-medium">Email</label>
+                <input
+                    pInputText
+                    id="email"
+                    type="email"
+                    formControlName="email"
+                    placeholder="Enter email"
+                />
+                <small class="p-error" *ngIf="get('email')?.touched && get('email')?.invalid">
+    <span *ngIf="get('email')?.errors?.['required']">Email is required</span>
+    <span *ngIf="get('email')?.errors?.['email']">Enter a valid email</span>
+</small>
+
+            </div>
+
+            <div class="flex flex-column gap-1">
+  <label>Password</label>
+
+  <p-password
+    formControlName="password"
+    placeholder="Enter password"
+    [toggleMask]="true"
+    [feedback]="false"
+    styleClass="w-full"
+    inputStyleClass="w-full">
+  </p-password>
+  <small class="p-error" *ngIf="get('password')?.touched && get('password')?.invalid">
+    <span *ngIf="get('password')?.errors?.['required']">Password is required</span>
+    <span *ngIf="get('password')?.errors?.['minlength']">
+        Password must be at least 8 characters
+    </span>
+</small>
+
+</div>
+
+
+            <div class="flex align-items-center justify-content-between">
+                <div class="flex align-items-center gap-2">
+                    <p-checkbox
+  binary="true"
+  formControlName="rememberMe">
+</p-checkbox>
+
+                    <label class="text-600">Remember me</label>
+                </div>
+
+                <a
+  class="font-medium text-primary cursor-pointer"
+  (click)="goToForgot()">
+  Forgot password?
+</a>
+
+            </div>
+
+            <p-button
+    type="submit"
+    label="Sign In"
+    icon="pi pi-sign-in"
+    styleClass="w-full"
+    [loading]="loading"
+    [disabled]="form.invalid">
+  </p-button>
+
+  <!-- SERVER ERROR -->
+<p-message
+    *ngIf="serverError"
+    severity="error"
+    [text]="serverError">
+</p-message>
+
+
+  <p class="switch-text">
+        Don't have an account?
+        <a class="font-medium no-underline ml-2 cursor-pointer text-primary hover:underline" (click)="goToRegister()">Register</a>
+      </p>
+
+        </form>
+        <div class="flex align-items-center my-4">
+    <div class="flex-grow-1 border-top-1 surface-border"></div>
+    <span class="mx-3 text-600">OR</span>
+    <div class="flex-grow-1 border-top-1 surface-border"></div>
+</div>
+
+
+        <div class="flex flex-column gap-2 mt-4">
+    <p-button 
+        label="Continue with Google"
+        icon="pi pi-google"
+        styleClass="p-button-outlined w-full"
+        (onClick)="loginWithGoogle()">
+    </p-button>
+
+     
+
+    <p-button 
+        label="Continue with Facebook"
+        icon="pi pi-facebook"
+        styleClass="p-button-outlined w-full p-button-secondary"
+        (onClick)="loginWithFacebook()">
+    </p-button>
+</div>
+
+    </div>
+</div>

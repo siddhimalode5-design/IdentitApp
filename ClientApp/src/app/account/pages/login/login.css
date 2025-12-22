@@ -1,0 +1,46 @@
+.login-card {
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  width: 100%;
+}
+ 
+
+h2 {
+  font-weight: 600;
+}
+
+.switch-text {
+  color: #718096;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+
+.switch-text a {
+  cursor: pointer;
+  color: #248ce0;
+}
+:host ::ng-deep .p-error {
+  color: #e24c4c;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+/* Input border turns red when invalid */
+:host ::ng-deep .ng-invalid.ng-touched .p-inputtext,
+:host ::ng-deep .ng-invalid.ng-touched .p-password-input {
+  border-color: #e24c4c !important;
+}
+
+/* Password eye icon alignment stays clean */
+:host ::ng-deep .p-password {
+  width: 100%;
+}
+
+/* Small spacing so errors are visible */
+:host ::ng-deep .field small {
+  margin-top: 0.25rem;
+  display: block;
+}
+
+

@@ -1,0 +1,43 @@
+.verified-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 60px;
+  padding: 20px;
+}
+
+.verified-card {
+  max-width: 420px;
+  width: 100%;
+  text-align: center;
+  padding: 20px;
+}
+
+.icon-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+.verified-icon {
+  font-size: 4rem;
+  color: #2e7d32;
+}
+
+.title {
+  font-size: 1.7rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #1b5e20;
+}
+
+.message {
+  font-size: 1rem;
+  margin-bottom: 20px;
+  color: #444;
+}
+
+.action-btn {
+  width: 100%;
+  margin-top: 10px;
+}
