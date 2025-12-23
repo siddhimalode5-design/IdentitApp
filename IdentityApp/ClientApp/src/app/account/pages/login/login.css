@@ -1,145 +1,46 @@
-.auth-container {
-  height: 100vh;
+.login-card {
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
   width: 100%;
-  background: url('../../../../assets/images/bg.jpg') no-repeat center center/cover;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
-
-.auth-card {
-  width: 380px;
-  padding: 30px;
-  background: rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(12px);
-  border-radius: 16px;
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.25);
-  text-align: center;
-}
+ 
 
 h2 {
-  margin-bottom: 5px;
   font-weight: 600;
-  color: #fff;
-}
-
-p {
-  color: #ddd;
-  margin-bottom: 20px;
-}
-
-.form-group {
-  text-align: left;
-  margin-bottom: 18px;
-}
-
-label {
-  display: block; 
-  color: #eee;
-  margin-bottom: 6px;
-}
-
-
-input {
-  width: 100%;
-}
-
-.auth-btn {
-  width: 100%;
-  margin-top: 10px;
 }
 
 .switch-text {
-  color: #eee;
+  color: #718096;
   font-size: 14px;
   margin-top: 10px;
 }
 
+
 .switch-text a {
   cursor: pointer;
-  color: #90caf9;
+  color: #248ce0;
+}
+:host ::ng-deep .p-error {
+  color: #e24c4c;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  display: block;
 }
 
-.social-btn {
-  width: 100%;
-  margin-top: 10px;
+/* Input border turns red when invalid */
+:host ::ng-deep .ng-invalid.ng-touched .p-inputtext,
+:host ::ng-deep .ng-invalid.ng-touched .p-password-input {
+  border-color: #e24c4c !important;
 }
 
-.fb {
-  background-color: #1877f2;
-  color: white;
-}
-
-.ln {
-  background-color: #0a66c2;
-  color: white;
-}
-
-.remember-forgot {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-}
-
-.remember-forgot label {
-    margin-left: 6px;
-}
-
-.forgot-link {
-    cursor: pointer;
-    color: #007ad9;
-    text-decoration: none;
-}
-
-.forgot-link:hover {
-    text-decoration: underline;
-}
-
-
-/*Force main password wrapper to full width */
-/* .auth-card .p-password {
-    width: 100% !important;
-    display: flex !important;
-} */
-
-/* Input inside p-password full width */
-/* .auth-card .p-password-input {
-    width: 100% !important;
-    flex: 1 !important;
-} */
-
-/* Fix PrimeNG internal input shrinking */
-/* .auth-card .p-inputwrapper input,
-.auth-card .p-password input {
-    width: 100% !important;
-    box-sizing: border-box !important;
-} */ 
-
+/* Password eye icon alignment stays clean */
 :host ::ng-deep .p-password {
-    width: 100% !important;
-    display: flex !important;
+  width: 100%;
 }
 
-:host ::ng-deep .p-password-input {
-    width: 100% !important;
-    flex: 1 !important;
+/* Small spacing so errors are visible */
+:host ::ng-deep .field small {
+  margin-top: 0.25rem;
+  display: block;
 }
-
-
-
-
-
-.remember-left label {
-  display: inline-block;
-  margin-bottom: 0;
-}
-
-.remember-left {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
 
 

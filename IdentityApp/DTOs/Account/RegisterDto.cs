@@ -15,8 +15,9 @@ namespace IdentityApp.DTOs.Account
         public string LastName { get; set; }
 
         [Required]
-        [RegularExpression("^\\w+@[a-zA-Z_]+?\\.[a-zA-Z]{2,3}$", ErrorMessage ="Invalid email address")]
-        public string  Email { get; set; }
+        [RegularExpression(@"^[^\s@]+@[^\s@]+\.[^\s@]+$", ErrorMessage = "Invalid email address")]
+        public string Email { get; set; }
+         
         [Required]
         public string Password { get; set; }
     }

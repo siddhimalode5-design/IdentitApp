@@ -1,0 +1,7 @@
+<h2>Account Settings</h2>
+
+<div *ngIf="user">
+  <p><b>Email:</b> {{ user.email }}</p>
+  <p><b>Role:</b> {{ user.roles?.join(', ') }}</p>
+  <p><b>Status:</b> Active</p>
+</div>

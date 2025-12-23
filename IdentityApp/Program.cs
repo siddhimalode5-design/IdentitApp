@@ -1,8 +1,12 @@
-using IdentityApp.Data;
+﻿using IdentityApp.Data;
 using IdentityApp.Models;
 using IdentityApp.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Facebook;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,9 +14,14 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+ 
+
 using System;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,7 +38,7 @@ builder.Services.AddDbContext<Context>(options =>
 );
 
 builder.Services.AddScoped<JWTService>();
- 
+
 builder.Services.AddScoped<EmailService>();
 
 
@@ -57,25 +66,112 @@ builder.Services.AddIdentityCore<User>(options =>
 .AddDefaultTokenProviders();// be able to create tokens for email confirmation
 
 
-// be able to authenticate users using JWT
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            // validate the token based on the key we have provided inside appsettings.development.json JWT:Key
-            ValidateIssuerSigningKey = true,
-            //the issuer singning key based on JWT:Key
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"])),
-            //the issuer which in here is the api project url we are using
-            ValidIssuer = builder.Configuration["JWT:Issuer"],
-            //validate the issuer (who ever is issuing the JWT)
-            ValidateIssuer = true,
-            //don't validate audience(angular side)
-            ValidateAudience = false
-        };
+builder.Services.AddAuthentication(options =>
+{
+    // 🔑 APIs use JWT by default
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 
-    });
+    // 🔐 External login still uses cookies internally
+    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+})
+
+//.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme) // app cookie
+
+// 🔐 REQUIRED FOR EXTERNAL LOGIN
+.AddCookie(options =>
+{
+    options.Events.OnRedirectToLogin = context =>
+    {
+        // 🔥 IMPORTANT: Stop redirect for APIs
+        if (context.Request.Path.StartsWithSegments("/api"))
+        {
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            return Task.CompletedTask;
+        }
+
+        context.Response.Redirect(context.RedirectUri);
+        return Task.CompletedTask;
+    };
+
+    options.Events.OnRedirectToAccessDenied = context =>
+    {
+        if (context.Request.Path.StartsWithSegments("/api"))
+        {
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+            return Task.CompletedTask;
+        }
+
+        context.Response.Redirect(context.RedirectUri);
+        return Task.CompletedTask;
+    };
+})
+
+
+// 🔐 JWT (for API access after login)
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"])
+        ),
+        ValidateIssuer = true,
+        ValidIssuer = builder.Configuration["JWT:Issuer"],
+        ValidateAudience = false,
+
+        // 🔥 REQUIRED FOR [Authorize(Roles = "Admin")]
+        RoleClaimType = ClaimTypes.Role,
+        NameClaimType = ClaimTypes.Email
+    };
+})
+
+
+//// 🍪 Cookie (REQUIRED for OAuth flow)
+//.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+//{
+//    options.Cookie.SameSite = SameSiteMode.None;
+//    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+//})
+
+
+// 🔴 Google
+.AddGoogle(options =>
+{
+    options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+    options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+
+    options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.CallbackPath = "/signin-google";
+
+    // 🔴 REQUIRED
+    options.Scope.Add("email");
+    options.Scope.Add("profile");
+
+    options.SaveTokens = true;
+})
+
+
+// 🔵 Facebook
+.AddFacebook(options =>
+{
+    options.AppId = builder.Configuration["Authentication:Facebook:AppId"];
+    options.AppSecret = builder.Configuration["Authentication:Facebook:AppSecret"];
+
+    options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+
+    // ✅ MUST be this
+    options.CallbackPath = "/signin-facebook";
+
+
+    options.Scope.Add("email");
+    options.Fields.Add("email");
+    options.Fields.Add("name");
+});
+
+ 
+
 
 builder.Services.AddCors(options =>
 {
@@ -83,9 +179,8 @@ builder.Services.AddCors(options =>
         policy =>
         {
             policy.WithOrigins(
-                "http://localhost:4200" // local Angular frontend
-                //"https://lucent-dragon-13b5ff.netlify.app", // Netlify frontend
-                //"https://pedodontic-fitfully-isidra.ngrok-free.dev" // your ngrok tunnel
+                "https://localhost:4200" // local Angular frontend
+                                         
             )
             .AllowAnyHeader()
             .AllowAnyMethod()
@@ -115,6 +210,10 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 
 
 var app = builder.Build();
+if (true)
+{
+    app.UseDeveloperExceptionPage();
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -123,12 +222,18 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
- 
 
 
 app.UseHttpsRedirection();
+
+
 app.UseCors("AllowAngular");
+
+
+
+
 app.UseAuthentication();
+
 app.UseAuthorization();
 
 app.MapControllers();
@@ -159,6 +264,39 @@ app.Lifetime.ApplicationStarted.Register(async () =>
         Console.WriteLine("MailJet Error: " + ex.Message);
     }
 });
+
+
+
+// 🔐 CREATE ROLES & ADMIN USER
+async Task CreateRolesAndAdminUser(IServiceProvider serviceProvider)
+{
+    var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = serviceProvider.GetRequiredService<UserManager<User>>();
+
+    string[] roles = { "Admin", "User" };
+
+    foreach (var role in roles)
+    {
+        if (!await roleManager.RoleExistsAsync(role))
+        {
+            await roleManager.CreateAsync(new IdentityRole(role));
+        }
+    }
+
+    var adminEmail = "siddhimalode5@gmail.com";
+
+    var adminUser = await userManager.FindByEmailAsync(adminEmail);
+    if (adminUser != null && !await userManager.IsInRoleAsync(adminUser, "Admin"))
+    {
+        await userManager.AddToRoleAsync(adminUser, "Admin");
+    }
+}
+
+// 🔥 EXECUTE IT ON APP START
+using (var scope = app.Services.CreateScope())
+{
+    await CreateRolesAndAdminUser(scope.ServiceProvider);
+}
 
 
 

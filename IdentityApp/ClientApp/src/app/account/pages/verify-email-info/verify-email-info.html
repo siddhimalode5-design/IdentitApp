@@ -8,9 +8,12 @@
 
   <p>Please check your inbox and click the link to activate your account.</p>
 
+  <div *ngIf="serverMessage" class="server-message mt-2">{{ serverMessage }}</div>
+
   <p-button 
-      label="Go to Login"
-      styleClass="p-button-primary w-full mt-3"
-      (onClick)="goToLogin()">
+      label="Resend Email"
+      styleClass="p-button-secondary w-full mt-3"
+      [disabled]="loading"
+      (onClick)="resendEmail()">
   </p-button>
 </div>

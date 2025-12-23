@@ -1,0 +1,55 @@
+<p-card header="Users Management">
+  <p-table
+    [value]="users"
+    [paginator]="true"
+    [rows]="10"
+    responsiveLayout="scroll">
+
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Status</th>
+        <th style="width: 200px">Actions</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-user>
+      <tr>
+        <td>{{ user.firstName }} {{ user.lastName }}</td>
+        <td>{{ user.email }}</td>
+
+        <td>
+          <p-tag
+            [value]="user.lockoutEnd ? 'Locked' : 'Active'"
+            [severity]="user.lockoutEnd ? 'danger' : 'success'">
+          </p-tag>
+        </td>
+
+        <td class="flex gap-2">
+          <!-- Lock / Unlock -->
+          <button
+  pButton
+  [icon]="user.lockoutEnd ? 'pi pi-unlock' : 'pi pi-lock'"
+  [severity]="user.lockoutEnd ? 'success' : 'secondary'"
+  size="small"
+  (click)="toggleLock(user)"
+  [disabled]="isSelf(user)">
+</button>
+
+
+          <!-- Delete -->
+          <button
+            pButton
+            icon="pi pi-trash"
+            severity="danger"
+            size="small"
+            (click)="deleteUser(user)"
+            [disabled]="isSelf(user)">
+          </button>
+        </td>
+      </tr>
+    </ng-template>
+
+  </p-table>
+</p-card>

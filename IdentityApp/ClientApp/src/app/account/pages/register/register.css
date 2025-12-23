@@ -1,117 +1,42 @@
-.auth-container {
-  height: 100vh;
-  width: 100%;
-  background: url('../../../../assets/images/bg.jpg') no-repeat center center/cover;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.auth-card {
-  width: 380px;
-  padding: 30px;
-  background: rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(12px);
-  border-radius: 16px;
-  box-shadow: 0 0 30px rgba(0, 0, 0, 0.25);
-  text-align: center;
-}
-
-h2 {
-  margin-bottom: 5px;
-  font-weight: 600;
-  color: #fff;
-}
-
-p {
-  color: #ddd;
-  margin-bottom: 20px;
-}
-
-.form-group {
-  text-align: left;
-  margin-bottom: 18px;
-}
-
-label {
-  display: block;
-  color: #eee;
-  margin-bottom: 6px;
-}
-
-input {
+/* Make all inputs take full width */
+:host ::ng-deep input.p-inputtext {
   width: 100%;
 }
 
-.auth-btn {
-  width: 100%;
-  margin-top: 10px;
-}
-
-.switch-text {
-  color: #eee;
-  font-size: 14px;
-  margin-top: 10px;
-}
-
-.switch-text a {
-  cursor: pointer;
-  color: #90caf9;
-}
-
-.social-btn {
-  width: 100%;
-  margin-top: 10px;
-}
-
-.fb {
-  background-color: #1877f2;
-  color: white;
-}
-
-.ln {
-  background-color: #0a66c2;
-  color: white;
-}
-
- 
-
-/* Force PrimeNG password wrapper full width */
+/* Fix PrimeNG password width */
 :host ::ng-deep .p-password {
-    width: 100% !important;
-    display: flex !important;
+  width: 100%;
 }
 
-/* Make internal input full width */
-:host ::ng-deep .p-password .p-inputtext {
-    width: 100% !important;
-    flex: 1 !important;
-    box-sizing: border-box !important;
+:host ::ng-deep .p-password input {
+  width: 100%;
 }
 
-/* Remove automatic shrinking caused by toggle icon */
-:host ::ng-deep .p-password-input-wrapper {
-    width: 100% !important;
-    flex: 1 !important;
+/* Optional: better spacing */
+.field {
+  width: 100%;
 }
-
-.error-box {
-  background: #ffe5e5;
-  color: #b30000;
-  padding: 10px;
-  border-radius: 5px;
-  margin-bottom: 15px;
-  font-size: 14px;
-}
-
-.api-error, small {
-  color: red !important;
-  font-size: 13px;
-  margin-top: 4px;
+/* Error text (red like Sakai) */
+:host ::ng-deep .p-error {
+  color: #e24c4c;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
   display: block;
 }
 
+/* Input border turns red when invalid */
+:host ::ng-deep .ng-invalid.ng-touched .p-inputtext,
+:host ::ng-deep .ng-invalid.ng-touched .p-password-input {
+  border-color: #e24c4c !important;
+}
 
+/* Password eye icon alignment stays clean */
+:host ::ng-deep .p-password {
+  width: 100%;
+}
 
-
-
+/* Small spacing so errors are visible */
+:host ::ng-deep .field small {
+  margin-top: 0.25rem;
+  display: block;
+}

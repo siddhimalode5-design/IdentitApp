@@ -9,26 +9,7 @@ import { Account } from '../../account';
   template: `<p>Verifying your email...</p>`
 })
 export class EmailVerifyCallback {
-  constructor(
-    private route: ActivatedRoute,
-    private account: Account,
-    private router: Router
-  ) {
-
-    const userId = this.route.snapshot.queryParamMap.get('userId');
-    const code = this.route.snapshot.queryParamMap.get('code');
-
-    if (userId && code) {
-      this.account.verifyEmail(userId, code).subscribe({
-        next: () => this.router.navigate(['/login'], {
-          queryParams: { verified: true }
-        }),
-        error: () => this.router.navigate(['/login'], {
-          queryParams: { verified: false }
-        })
-      });
-    }
-  }
+   
 
 }
 

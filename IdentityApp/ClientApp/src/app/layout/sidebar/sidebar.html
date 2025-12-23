@@ -1,0 +1,20 @@
+<div class="sidebar"> 
+  <ul>
+    <li>
+      <a routerLink="/dashboard" routerLinkActive="active">
+        Dashboard
+      </a>
+    </li>
+
+    <li *ngIf="auth.user()?.roles?.includes('Admin')">
+  <a routerLink="/users">Users</a>
+</li>
+
+
+    <li>
+      <a routerLink="/settings" routerLinkActive="active">
+        Settings
+      </a>
+    </li>
+  </ul>
+</div>

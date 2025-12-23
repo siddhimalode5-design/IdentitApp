@@ -9,6 +9,8 @@ import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { DividerModule } from 'primeng/divider';
 import { CommonModule } from '@angular/common';
+import { MessageModule } from 'primeng/message';
+
 
 import { Account } from '../../../account/account'; // adjust path if needed
 
@@ -22,7 +24,8 @@ import { Account } from '../../../account/account'; // adjust path if needed
     PasswordModule,
     ButtonModule,
     CheckboxModule,
-    DividerModule
+    DividerModule,
+    MessageModule
   ],
   templateUrl: './login.html',
   styleUrls: ['./login.css']
@@ -65,25 +68,29 @@ export class Login {
     };
 
     this.account.login(payload).subscribe({
-      next: (res: any) => {
+   next: (res: any) => {
   this.loading = false;
 
-  const token = res.jwt;
-  if (token) {
+  console.log('LOGIN RESPONSE:', res);
 
-    const userData = {
-      firstName: res.firstName,
-      lastName: res.lastName
-    };
-
-    this.auth.login(token, userData);
-
-    this.router.navigate(['/dashboard']);
+  // ✅ STRICT RESPONSE CHECK
+  if (!res || !res.token || !res.user) {
+    this.serverError = 'Unexpected server response.';
     return;
   }
 
-  this.serverError = 'Unexpected server response.';
+  this.auth.login(
+    res.token,
+    {
+      email: res.user.email,
+      roles: res.user.roles
+    },
+    this.get('rememberMe')!.value
+  );
+
+  this.router.navigate(['/dashboard']);
 },
+
 
 
       error: (err: any) => {
@@ -143,4 +150,26 @@ export class Login {
 
     return 'Server error';
   }
+
+   
+  
+
+  // submit() {
+  //   if (this.form.invalid) {
+  //     this.form.markAllAsTouched();
+  //     return;
+  //   }
+
+  //   console.log(this.form.value);
+  // }
+  loginWithGoogle() {
+  window.location.href = 'https://localhost:7008/api/auth/google';
+}
+
+
+
+loginWithFacebook() {
+  window.location.href = 'https://localhost:7008/api/auth/facebook';
+}
+
 }

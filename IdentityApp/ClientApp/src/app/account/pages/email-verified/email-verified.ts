@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
  
 import { Card } from 'primeng/card';
@@ -12,16 +12,16 @@ import { Divider } from 'primeng/divider';
   templateUrl: './email-verified.html',
   styleUrls: ['./email-verified.css'],
 })
-export class EmailVerified {
+export class EmailVerified implements OnInit {
 
   isSuccess: boolean = false;
 
   constructor(private router: Router, private route: ActivatedRoute) {}
 
-  ngOnInit() {
-    this.route.queryParams.subscribe(params => {
-      this.isSuccess = params['status'] === 'success';
-    });
+  ngOnInit(): void {
+    setTimeout(() => {
+      this.router.navigate(['/login']);
+    }, 5000);
   }
 
   goToLogin() {
