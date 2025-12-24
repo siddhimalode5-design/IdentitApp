@@ -3,6 +3,9 @@
 ##
 ## Get latest from `dotnet new gitignore`
 
+# Local SSL certificates (DO NOT COMMIT)
+ClientApp/ssl/
+
 # dotenv files
 .env
 
