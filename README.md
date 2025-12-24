@@ -1,6 +1,6 @@
 # IdentityApp 🔐
 
-IdentityApp is a **full-featured authentication and user management system** built with **ASP.NET Core 8** and **Angular**. It includes:
+IdentityApp is a **feature-rich authentication and user management system** built with **ASP.NET Core 8** and **Angular**. It includes:
 
 - Secure email/password login  
 - External login with **Google** and **Facebook**  
@@ -17,7 +17,7 @@ IdentityApp is a **full-featured authentication and user management system** bui
 
 - Project Overview  
 - Features  
-- Technologies Used  
+- Technologies Used   
 - Folder & File Structure  
 - Setup & Installation  
 - Usage  
@@ -33,7 +33,7 @@ IdentityApp is a **full-featured authentication and user management system** bui
 IdentityApp provides a **secure and extendable authentication system** for web applications.
 
 - Users can register, log in, and manage their accounts  
-- Admins can manage users, roles, and application settings  
+- Admins can manage users and roles, and access admin settings pages
 
 ### 🎯 Key Goals
 
@@ -148,7 +148,7 @@ Wrap URLs in backticks or angle brackets:
 ```md
 Frontend runs on: http://localhost:4200  
 Backend runs on: http://localhost:7008
-
+```
 ---
 
 ## 🧪 Usage
@@ -172,7 +172,7 @@ Backend runs on: http://localhost:7008
 ## 🔄 Authentication & Role Flow
 
 1. Registration → Email verification  
-2. Login → JWT token & cookie stored in browser  
+2. Login → JWT token securely stored and used for authenticated API access
 3. Angular **AuthGuard** checks:
    - Login status  
    - User roles  
