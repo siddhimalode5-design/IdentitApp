@@ -115,6 +115,8 @@ git clone https://github.com/<username>/IdentityApp.git
 cd IdentityApp
 dotnet restore
 
+```
+
 
 ## ⚙️ Backend Configuration
 
