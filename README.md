@@ -87,7 +87,7 @@ IdentityApp provides a **secure and extendable authentication system** for web a
 | Layer          | Technology |
 |---------------|------------|
 | Backend       | ASP.NET Core 8, C#, Entity Framework Core |
-| Frontend      | Angular, TypeScript, PrimeNG |
+| Frontend     | Angular, TypeScript, PrimeNG |
 | Database      | SQL Server (or SQLite) |
 | Authentication| JWT, Cookies, OAuth 2.0, ASP.NET Identity |
 | Email         | MailJet API (email verification & password reset) |
@@ -103,7 +103,7 @@ IdentityApp/
 ├── Data/              # ApplicationDbContext
 ├── Program.cs         # Application startup configuration
 ├── appsettings.json   # Database, MailJet & OAuth credentials
-├── Frontend/          # Angular app (components, services, guards)
+├── ClientApp/          # Angular app (components, services, guards)
 └── README.md
 ```
 ## 🚀 Setup & Installation
@@ -130,21 +130,24 @@ Run the backend:
 
 ```bash
 dotnet run
-
+```
 ---
 
 ## 🧑‍💻 Frontend
 
 ```bash
-cd Frontend
+cd ClientApp
 npm install
 ng serve
+```
 
+### 🔹 3. Make URLs Clickable
 
-Frontend runs on: http://localhost:4200
+Wrap URLs in backticks or angle brackets:
 
+```md
+Frontend runs on: http://localhost:4200  
 Backend runs on: http://localhost:7008
- (or configured port)
 
 ---
 
