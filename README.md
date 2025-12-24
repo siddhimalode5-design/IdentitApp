@@ -105,7 +105,7 @@ IdentityApp/
 ├── appsettings.json   # Database, MailJet & OAuth credentials
 ├── Frontend/          # Angular app (components, services, guards)
 └── README.md
-
+```
 ## 🚀 Setup & Installation
 
 ### Backend
