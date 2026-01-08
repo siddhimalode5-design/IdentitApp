@@ -1,0 +1,31 @@
+<p-dialog
+  header="Edit User Name"
+  [(visible)]="visible"
+  modal="true"
+  [style]="{ width: '400px' }"
+  (onHide)="close.emit()">
+
+  <div class="flex flex-col gap-3">
+    <label class="font-medium">Full Name</label>
+
+    <input
+      pInputText
+      [(ngModel)]="fullName"
+      placeholder="Enter full name" />
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      label="Cancel"
+      class="p-button-text"
+      (click)="close.emit()">
+    </button>
+
+    <button
+      pButton
+      label="Save"
+      (click)="save.emit(fullName)">
+    </button>
+  </ng-template>
+</p-dialog>

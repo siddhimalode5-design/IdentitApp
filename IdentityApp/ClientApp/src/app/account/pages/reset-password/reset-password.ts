@@ -6,7 +6,7 @@ import { ButtonModule } from 'primeng/button';
 import { PasswordModule } from 'primeng/password';
 import { Account } from '../../../account/account';
 import { MessageModule } from 'primeng/message'; // <-- import this
-
+import { AppFloatingConfigurator } from '../../../layout/component/app.floatingconfigurator';
 @Component({
   selector: 'app-reset-password',
   standalone: true,
@@ -15,7 +15,8 @@ import { MessageModule } from 'primeng/message'; // <-- import this
     ReactiveFormsModule,
     ButtonModule,
     PasswordModule,
-    MessageModule
+    MessageModule,
+    AppFloatingConfigurator
     
   ],
   templateUrl: './reset-password.html',

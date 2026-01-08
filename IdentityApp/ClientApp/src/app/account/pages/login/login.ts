@@ -11,7 +11,14 @@ import { DividerModule } from 'primeng/divider';
 import { CommonModule } from '@angular/common';
 import { MessageModule } from 'primeng/message';
 
-
+ 
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+ 
+ 
+ 
+import { RippleModule } from 'primeng/ripple';
+import { AppFloatingConfigurator } from '../../../layout/component/app.floatingconfigurator';
 import { Account } from '../../../account/account'; // adjust path if needed
 
 @Component({
@@ -25,7 +32,11 @@ import { Account } from '../../../account/account'; // adjust path if needed
     ButtonModule,
     CheckboxModule,
     DividerModule,
-    MessageModule
+    MessageModule,
+    FormsModule,
+    RouterModule,
+    RippleModule,
+AppFloatingConfigurator
   ],
   templateUrl: './login.html',
   styleUrls: ['./login.css']
@@ -34,7 +45,7 @@ export class Login {
   form!: FormGroup;
   loading = false;
   serverError = '';
-
+  checked: boolean = false;
   constructor(
     private fb: FormBuilder,
     private router: Router,

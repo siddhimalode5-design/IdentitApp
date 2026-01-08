@@ -1,6 +1,6 @@
 # IdentityApp 🔐
 
-IdentityApp is a **full-featured authentication and user management system** built with **ASP.NET Core 8** and **Angular**. It includes:
+IdentityApp is a **feature-rich authentication and user management system** built with **ASP.NET Core 8** and **Angular**. It includes:
 
 - Secure email/password login  
 - External login with **Google** and **Facebook**  
@@ -17,7 +17,7 @@ IdentityApp is a **full-featured authentication and user management system** bui
 
 - Project Overview  
 - Features  
-- Technologies Used  
+- Technologies Used   
 - Folder & File Structure  
 - Setup & Installation  
 - Usage  
@@ -33,7 +33,7 @@ IdentityApp is a **full-featured authentication and user management system** bui
 IdentityApp provides a **secure and extendable authentication system** for web applications.
 
 - Users can register, log in, and manage their accounts  
-- Admins can manage users, roles, and application settings  
+- Admins can manage users and roles, and access admin settings pages
 
 ### 🎯 Key Goals
 
@@ -87,7 +87,7 @@ IdentityApp provides a **secure and extendable authentication system** for web a
 | Layer          | Technology |
 |---------------|------------|
 | Backend       | ASP.NET Core 8, C#, Entity Framework Core |
-| Frontend      | Angular, TypeScript, PrimeNG |
+| Frontend     | Angular, TypeScript, PrimeNG |
 | Database      | SQL Server (or SQLite) |
 | Authentication| JWT, Cookies, OAuth 2.0, ASP.NET Identity |
 | Email         | MailJet API (email verification & password reset) |
@@ -95,7 +95,7 @@ IdentityApp provides a **secure and extendable authentication system** for web a
 ---
 
 ## 📁 Folder & File Structure
- 
+```text
 IdentityApp/
 ├── Controllers/       # AuthController, UsersController
 ├── Models/            # User, Role, DTOs
@@ -103,17 +103,19 @@ IdentityApp/
 ├── Data/              # ApplicationDbContext
 ├── Program.cs         # Application startup configuration
 ├── appsettings.json   # Database, MailJet & OAuth credentials
-├── Frontend/          # Angular app (components, services, guards)
+├── ClientApp/          # Angular app (components, services, guards)
 └── README.md
-
+```
 ## 🚀 Setup & Installation
 
 ### Backend
 
- 
+```bash
 git clone https://github.com/<username>/IdentityApp.git
 cd IdentityApp
 dotnet restore
+
+```
 
 
 ## ⚙️ Backend Configuration
@@ -125,23 +127,28 @@ Update `appsettings.json` with:
 - **Google & Facebook OAuth credentials**
 
 Run the backend:
- 
-dotnet run
 
+```bash
+dotnet run
+```
 ---
 
 ## 🧑‍💻 Frontend
- 
-cd Frontend
+
+```bash
+cd ClientApp
 npm install
 ng serve
+```
 
+### 🔹 3. Make URLs Clickable
 
-Frontend runs on: http://localhost:4200
+Wrap URLs in backticks or angle brackets:
 
+```md
+Frontend runs on: http://localhost:4200  
 Backend runs on: http://localhost:7008
- (or configured port)
-
+```
 ---
 
 ## 🧪 Usage
@@ -165,7 +172,7 @@ Backend runs on: http://localhost:7008
 ## 🔄 Authentication & Role Flow
 
 1. Registration → Email verification  
-2. Login → JWT token & cookie stored in browser  
+2. Login → JWT token securely stored and used for authenticated API access
 3. Angular **AuthGuard** checks:
    - Login status  
    - User roles  

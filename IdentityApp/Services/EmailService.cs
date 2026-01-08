@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace IdentityApp.Services
 {
-    public class EmailService
+    public class EmailService : IMailService
     {
         private readonly IConfiguration _config;
 
@@ -37,22 +37,10 @@ namespace IdentityApp.Services
 
                 var response = await client.SendTransactionalEmailAsync(email);
 
-                Console.WriteLine("=== MAILJET SEND RESPONSE START ===");
-                Console.WriteLine(response);
-
-                if (response.Messages?[0]?.Status == "success")
-                {
-                    Console.WriteLine("Email sent successfully.");
-                    return true;
-                }
-
-                Console.WriteLine("Mailjet returned failure status.");
-                return false;
+                return response.Messages?[0]?.Status == "success";
             }
-            catch (Exception ex)
+            catch
             {
-                Console.WriteLine("MAILJET ERROR: " + ex.ToString());
-
                 return false;
             }
         }

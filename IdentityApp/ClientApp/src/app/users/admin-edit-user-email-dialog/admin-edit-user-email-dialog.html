@@ -1,0 +1,47 @@
+<p-dialog
+  header="Edit User Email"
+  [visible]="visible"
+  [modal]="true"
+  [closable]="false"
+  appendTo="body"
+  [focusOnShow]="false"
+  [style]="{ width: '420px' }"
+  (onHide)="close()">
+
+
+  <form [formGroup]="emailForm" (ngSubmit)="submit()">
+
+    <div class="mb-3">
+      <label class="block text-sm font-medium mb-1">New Email</label>
+      <input
+        pInputText
+        type="email"
+        formControlName="newEmail"
+        class="w-full"
+        placeholder="Enter new email address" />
+    </div>
+
+    <p class="text-xs text-gray-500 mb-4">
+      A verification link will be sent to this email.
+    </p>
+
+    <div class="flex justify-end gap-2">
+      <button
+        pButton
+        type="button"
+        label="Cancel"
+        class="p-button-text"
+        (click)="close()">
+      </button>
+
+      <button
+        pButton
+        type="submit"
+        label="Send Verification"
+        class="p-button-primary"
+        [disabled]="emailForm.invalid">
+      </button>
+    </div>
+
+  </form>
+</p-dialog>

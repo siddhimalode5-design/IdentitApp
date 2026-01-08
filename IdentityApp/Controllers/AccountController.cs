@@ -26,19 +26,24 @@ namespace IdentityApp.Controllers
         private readonly UserManager<User> _userManager;
         private readonly EmailService _emailService;
         private readonly IConfiguration _config;
+        private readonly IMailService _mailService;
 
         public AccountController(
             JWTService jwtService,
             SignInManager<User> signInManager,
             UserManager<User> userManager,
-            EmailService emailService,
-            IConfiguration config)
+            
+            IConfiguration config,
+            IMailService mailService)
         {
+
+        
             _jwtService = jwtService;
             _signInManager = signInManager;
             _userManager = userManager;
-            _emailService = emailService;
+             
             _config = config;
+            _mailService = mailService;
         }
 
         // ======================================================
@@ -57,12 +62,15 @@ namespace IdentityApp.Controllers
             if (user == null)
                 return Unauthorized("User not found");
 
+            if (user.IsDeleted)
+                return Unauthorized("Account has been deleted.");
+
             return await  CreateApplicationUserDto(user);
 
         }
 
         // ======================================================
-         // ======================================================
+        // ======================================================
         // LOGIN
         // ======================================================
         [HttpPost("login")]
@@ -71,20 +79,35 @@ namespace IdentityApp.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var user = await _userManager.FindByNameAsync(model.UserName);
+            var user = await _userManager.FindByEmailAsync(model.UserName.ToLower());
             if (user == null)
-                return Unauthorized("Invalid username or password");
+                return Unauthorized("Invalid email or password");
+
+            if (user.IsDeleted)
+                return Unauthorized("Account suspended. Contact administrator.");
+
+            if (user.LockoutEnd > DateTimeOffset.UtcNow)
+                return Unauthorized("Account temporarily locked due to security reasons.");
+
 
             if (!user.EmailConfirmed)
                 return Unauthorized("Please confirm your email.");
 
-            var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, false);
+            var result = await _signInManager.CheckPasswordSignInAsync(
+                user,
+                model.Password,
+                lockoutOnFailure: false
+            );
+
+            if (result.IsLockedOut)
+                return Unauthorized("Your account is locked. Contact admin.");
 
             if (!result.Succeeded)
-                return Unauthorized("Invalid username or password");
+                return Unauthorized("Invalid email or password");
 
             return await CreateApplicationUserDto(user);
         }
+
 
 
         // ======================================================
@@ -176,6 +199,26 @@ namespace IdentityApp.Controllers
             }
         }
 
+        [HttpPost("confirm-email-change")]
+        public async Task<IActionResult> ConfirmEmailChange(
+    string userId,
+    string email,
+    string token)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                return NotFound();
+
+            var result = await _userManager.ChangeEmailAsync(user, email, token);
+            if (!result.Succeeded)
+                return BadRequest(result.Errors);
+
+            user.EmailConfirmed = true;
+            user.UserName = email;
+            await _userManager.UpdateAsync(user);
+
+            return Ok();
+        }
 
 
 
@@ -235,6 +278,9 @@ namespace IdentityApp.Controllers
             if (user == null)
                 return Unauthorized("Invalid request");
 
+            if (user.IsDeleted)
+    return Unauthorized("Account has been deleted.");
+
             var decodedTokenBytes = WebEncoders.Base64UrlDecode(model.Token);
             var decodedToken = Encoding.UTF8.GetString(decodedTokenBytes);
 
@@ -256,6 +302,82 @@ namespace IdentityApp.Controllers
             return Ok("User is now Admin");
         }
 
+        [Authorize]
+        [HttpPost("change-password")]
+        public async Task<IActionResult> ChangePassword(ChangePasswordDto model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(new { message = "Invalid input data." });
+
+            if (model.CurrentPassword == model.NewPassword)
+                return BadRequest(new { message = "New password must be different from current password." });
+
+            if (model.NewPassword != model.ConfirmPassword)
+                return BadRequest(new { message = "Passwords do not match." });
+
+            var email = User.FindFirstValue(ClaimTypes.Email);
+            var user = await _userManager.FindByEmailAsync(email);
+
+            if (user == null)
+                return Unauthorized(new { message = "User not found." });
+
+            if (user.IsDeleted)
+                return Unauthorized(new { message = "Account deleted." });
+
+            var result = await _userManager.ChangePasswordAsync(
+                user,
+                model.CurrentPassword,
+                model.NewPassword
+            );
+
+            if (!result.Succeeded)
+            {
+                foreach (var error in result.Errors)
+                {
+                    if (error.Code == "PasswordMismatch")
+                    {
+                        return BadRequest(new
+                        {
+                            message = "Current password is wrong"
+                        });
+                    }
+
+                    if (error.Code == "PasswordTooShort")
+                    {
+                        return BadRequest(new
+                        {
+                            message = "New password is too short"
+                        });
+                    }
+                }
+
+                return BadRequest(new
+                {
+                    message = "Failed to change password"
+                });
+            }
+
+
+            await _userManager.UpdateSecurityStampAsync(user);
+
+            return Ok(new { message = "Password changed successfully." });
+        }
+
+
+        [Authorize]
+        [HttpPost("logout-all")]
+        public async Task<IActionResult> LogoutAll()
+        {
+            var email = User.FindFirstValue(ClaimTypes.Email);
+            var user = await _userManager.FindByEmailAsync(email);
+
+            if (user == null)
+                return Unauthorized();
+
+            await _userManager.UpdateSecurityStampAsync(user);
+
+            return Ok(new { message = "Logged out from all devices" });
+        }
 
 
         // ======================================================
@@ -334,7 +456,8 @@ namespace IdentityApp.Controllers
                 body
             );
 
-            return await _emailService.SendEmailAsync(emailSend);
+            return await _mailService.SendEmailAsync(emailSend);
+
         }
 
 
@@ -355,7 +478,8 @@ namespace IdentityApp.Controllers
 
             var emailSend = new EmailSendDto(user.Email, "Forgot password", body);
 
-            return await _emailService.SendEmailAsync(emailSend);
+            return await _mailService.SendEmailAsync(emailSend);
+
 
         }
     }

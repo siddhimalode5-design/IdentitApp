@@ -11,6 +11,8 @@ namespace IdentityApp.Models
         [Required]
         public string LastName { get; set; }
         public DateTime DateCreated { get; set; } = DateTime.UtcNow;
+        // ✅ SOFT DELETE FLAG
+        public bool IsDeleted { get; set; } = false;
     }
-    
+
 }

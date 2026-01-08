@@ -25,8 +25,7 @@
               }
             ],
             "styles": [
-               
-              "src/styles.css"
+              "src/assets/styles.scss"
             ]
           },
           "configurations": {
@@ -44,34 +43,34 @@
                 }
               ],
               "outputHashing": "all",
-
-               "fileReplacements": [
-      {
-        "replace": "src/environments/environment.ts",
-        "with": "src/environments/environment.ts"
-      }
-    ]
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.ts"
+                }
+              ]
             },
             "development": {
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true,
               "fileReplacements": [
-      {
-        "replace": "src/environments/environment.ts",
-        "with": "src/environments/environment.development.ts"
-      }
-    ]
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.development.ts"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"
         },
         "serve": {
           "builder": "@angular/build:dev-server",
-          "options": {"sslCert": "ssl/localhost.pem",
-          "sslKey":"ssl/localhost-key.pem",
-          "ssl":true
-        },
+          "options": {
+            "sslCert": "ssl/localhost.pem",
+            "sslKey": "ssl/localhost-key.pem",
+            "ssl": true
+          },
           "configurations": {
             "production": {
               "buildTarget": "ClientApp:build:production"
@@ -100,7 +99,7 @@
               }
             ],
             "styles": [
-              "src/styles.css"
+             "src/assets/styles.scss"
             ]
           }
         }

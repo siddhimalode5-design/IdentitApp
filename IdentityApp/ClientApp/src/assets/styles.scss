@@ -1,0 +1,23 @@
+/* Sakai layout bootstrap */
+ 
+/* 1️⃣ PrimeFlex — layout foundation */
+//  @use "primeflex/primeflex.css";
+
+/* 2️⃣ Tailwind v4 utilities (Sakai-style) */
+@use "./tailwind.css";
+
+/* 3️⃣ PrimeIcons */
+@use "primeicons/primeicons.css";
+
+/* 4️⃣ Sakai layout styles */
+@use "./sakai/layout/layout.scss";
+
+ 
+/* 5️⃣ Sakai demo styles (optional but OK) */
+@use "./sakai/demo/demo.scss";
+
+ 
+
+ 
+ 
+

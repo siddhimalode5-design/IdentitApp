@@ -4,10 +4,11 @@ import { ButtonModule } from 'primeng/button';
 import { CommonModule } from '@angular/common';
 import { Account } from '../../account';
 import { finalize } from 'rxjs';
+import { MessageModule } from 'primeng/message';
 
 @Component({
   selector: 'app-verify-email-info',
-  imports: [ButtonModule, CommonModule],
+  imports: [ButtonModule, CommonModule,MessageModule],
   standalone: true,
   templateUrl: './verify-email-info.html',
     styleUrls: ['./verify-email-info.css'], // fixed

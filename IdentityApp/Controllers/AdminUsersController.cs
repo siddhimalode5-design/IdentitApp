@@ -1,8 +1,11 @@
-﻿using IdentityApp.Models;
+﻿using IdentityApp.DTOs.Account;
+using IdentityApp.Models;
+using IdentityApp.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Linq;
 using System.Security.Claims;
@@ -18,9 +21,16 @@ namespace IdentityApp.Controllers
     {
         private readonly UserManager<User> _userManager;
 
-        public AdminUsersController(UserManager<User> userManager)
+        private readonly IMailService _mailService;
+        private readonly IConfiguration _config;
+
+
+        public AdminUsersController(UserManager<User> userManager, IMailService mailService,
+    IConfiguration config)
         {
             _userManager = userManager;
+            _mailService = mailService;
+            _config = config;
         }
 
         [HttpGet]
@@ -30,7 +40,7 @@ namespace IdentityApp.Controllers
     [FromQuery] int pageSize = 10)
         {
             var query = _userManager.Users
-                .Where(u => u.EmailConfirmed);
+                .Where(u => u.EmailConfirmed && !u.IsDeleted); // ✅ exclude deleted
 
             if (!string.IsNullOrWhiteSpace(search))
             {
@@ -52,16 +62,14 @@ namespace IdentityApp.Controllers
                     u.FirstName,
                     u.LastName,
                     u.Email,
-                    IsLocked = u.LockoutEnd != null && u.LockoutEnd > DateTimeOffset.UtcNow
+                    IsLocked = u.LockoutEnd != null &&
+                               u.LockoutEnd > DateTimeOffset.UtcNow
                 })
                 .ToList();
 
-            return Ok(new
-            {
-                totalUsers,
-                users
-            });
+            return Ok(new { totalUsers, users });
         }
+
 
 
 
@@ -84,7 +92,7 @@ namespace IdentityApp.Controllers
 
             await _userManager.UpdateAsync(user);
 
-            return Ok("User locked");
+            return Ok(new { message = "User Lock Successfully" });
         }
 
         [HttpPut("unlock/{userId}")]
@@ -101,7 +109,7 @@ namespace IdentityApp.Controllers
             user.LockoutEnd = null;
             await _userManager.UpdateAsync(user);
 
-            return Ok("User unlocked");
+            return Ok(new { message = "User Unlock Successfully" });
         }
 
 
@@ -111,17 +119,148 @@ namespace IdentityApp.Controllers
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
                 return NotFound("User not found");
-            // ✅ ADD THIS
+
             var currentUserEmail = User.FindFirstValue(ClaimTypes.Email);
             if (user.Email == currentUserEmail)
                 return BadRequest("You cannot delete your own account");
-            await _userManager.DeleteAsync(user);
-            return Ok("User deleted");
+
+            // ✅ SOFT DELETE
+            user.IsDeleted = true;
+
+            // 🔒 also block login permanently
+            user.LockoutEnd = DateTimeOffset.UtcNow.AddYears(100);
+
+            await _userManager.UpdateAsync(user);
+
+            return Ok(new
+            {
+                message = "User permanently deleted"
+            });
         }
+
+        [HttpPut("suspend/{userId}")]
+        public async Task<IActionResult> SuspendUser(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                return NotFound("User not found");
+
+            var currentUserEmail = User.FindFirstValue(ClaimTypes.Email);
+            if (user.Email == currentUserEmail)
+                return BadRequest("You cannot suspend your own account");
+
+            user.IsDeleted = true; // soft delete
+            user.LockoutEnd = DateTimeOffset.UtcNow.AddYears(100);
+
+            await _userManager.UpdateAsync(user);
+
+            return Ok(new { message = "User suspended successfully" });
+        }
+
+        [HttpPut("unsuspend/{userId}")]
+        public async Task<IActionResult> UnsuspendUser(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                return NotFound("User not found");
+
+            user.IsDeleted = false;
+            user.LockoutEnd = null;
+
+            await _userManager.UpdateAsync(user);
+
+            return Ok(new { message = "User unsuspended successfully" });
+        }
+
+
+        [HttpPut("{id}/update-basic")]
+        public async Task<IActionResult> UpdateUserBasicInfo(
+            string id,
+            AdminUpdateUserDto dto)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+                return NotFound("User not found");
+
+            // normalize (optional but recommended)
+            var firstName = dto.FirstName?.Trim();
+            var lastName = dto.LastName?.Trim();
+
+            // allow old → new → old (NO blocking)
+            user.FirstName = firstName;
+            user.LastName = lastName;
+
+            var result = await _userManager.UpdateAsync(user);
+
+            if (!result.Succeeded)
+            {
+                return BadRequest(new
+                {
+                    message = "Failed to update user name",
+                    errors = result.Errors.Select(e => e.Description)
+                });
+            }
+
+            return Ok(new
+            {
+                message = "User basic details updated successfully"
+            });
+        }
+
+
+
+        [HttpPut("{id}/change-email")]
+        public async Task<IActionResult> AdminChangeEmail(
+    string id,
+    AdminChangeEmailDto dto)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+                return NotFound("User not found");
+
+            if (user.Email == dto.NewEmail)
+                return BadRequest("Email is same as current");
+
+            var token = await _userManager.GenerateChangeEmailTokenAsync(
+                user,
+                dto.NewEmail
+            );
+
+            user.EmailConfirmed = false;
+            await _userManager.UpdateAsync(user);
+
+            var confirmLink =
+    $"{_config["JWT:ClientUrl"]}/verify-email" +
+    $"?userId={user.Id}" +
+    $"&email={dto.NewEmail}" +
+    $"&token={Uri.EscapeDataString(token)}" +
+    $"&type=change";
+
+
+
+            await _mailService.SendEmailAsync(
+    new EmailSendDto(
+        dto.NewEmail,
+        "Confirm your new email",
+        $"Click here to confirm: {confirmLink}"
+    )
+);
+
+
+            return Ok(new
+            {
+                message = "Verification link sent to new email address"
+            });
+
+        }
+
+         
+
+
 
     }
 }
 
 
- 
- 
+
+

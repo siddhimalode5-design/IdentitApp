@@ -5,6 +5,7 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { Account } from '../../../account/account';
 import { RouterModule } from '@angular/router';
+import { AppFloatingConfigurator } from '../../../layout/component/app.floatingconfigurator';
 
 @Component({
   selector: 'app-forgot-password',
@@ -14,7 +15,8 @@ import { RouterModule } from '@angular/router';
     ReactiveFormsModule,
     ButtonModule,
     InputTextModule,
-    RouterModule
+    RouterModule,
+    AppFloatingConfigurator
   ],
   templateUrl: './forgot-password.html',
   styleUrls: ['./forgot-password.css']

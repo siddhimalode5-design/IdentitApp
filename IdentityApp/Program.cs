@@ -39,7 +39,8 @@ builder.Services.AddDbContext<Context>(options =>
 
 builder.Services.AddScoped<JWTService>();
 
-builder.Services.AddScoped<EmailService>();
+builder.Services.AddScoped<IMailService, EmailService>();
+
 
 
 

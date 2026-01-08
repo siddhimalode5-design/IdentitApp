@@ -6,17 +6,27 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeuix/themes/aura';
 
+import {withFetch } from '@angular/common/http';
+ 
+ 
+import {  withEnabledBlockingInitialNavigation, withInMemoryScrolling } from '@angular/router';
+ 
+ 
+ 
+
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(routes),
+    provideRouter(routes, withInMemoryScrolling({ anchorScrolling: 'enabled', scrollPositionRestoration: 'enabled' }), withEnabledBlockingInitialNavigation()),
      provideAnimationsAsync(),
-     provideHttpClient(), 
-        providePrimeNG({
-            theme: {
-                preset: Aura
-            }
-        })
+       provideHttpClient(withFetch()),
+                providePrimeNG({ theme: { preset: Aura, options: { darkModeSelector: '.app-dark' } } })
+
+         
+       
+       
+ 
   ]
+
 };

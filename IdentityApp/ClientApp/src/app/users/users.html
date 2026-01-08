@@ -1,4 +1,47 @@
+<div class="mb-6">
+  <h1 class="text-2xl font-semibold text-gray-800">
+    Users Management
+  </h1>
+  <p class="text-sm text-gray-500">
+    Manage registered users, lock accounts, and control access
+  </p>
+</div>
+
 <p-card header="Users Management">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+  <div class="bg-white rounded-lg shadow p-4">
+    <p class="text-sm text-gray-500">Total Users</p>
+    <p class="text-2xl font-semibold">{{ totalUsers }}</p>
+  </div>
+
+  <div class="bg-white rounded-lg shadow p-4">
+    <p class="text-sm text-gray-500">Active Users</p>
+    <p class="text-2xl font-semibold text-green-600">
+      {{ activeUsers }}
+    </p>
+  </div>
+
+  <div class="bg-white rounded-lg shadow p-4">
+    <p class="text-sm text-gray-500">Locked Users</p>
+    <p class="text-2xl font-semibold text-red-600">
+      {{ lockedUsers }}
+    </p>
+  </div>
+</div>
+
+
+<div class="flex items-center gap-3 mb-4">
+  <span class="p-input-icon-left w-full max-w-sm">
+    <i class="pi pi-search"></i>
+    <input
+  type="text"
+  placeholder="Search by name or email"
+  (input)="onSearchChange($event.target.value)"
+/>
+
+  </span>
+</div>
+
   <p-table
     [value]="users"
     [paginator]="true"
@@ -21,35 +64,77 @@
 
         <td>
           <p-tag
-            [value]="user.lockoutEnd ? 'Locked' : 'Active'"
-            [severity]="user.lockoutEnd ? 'danger' : 'success'">
-          </p-tag>
+  [value]="user.isLocked ? 'Locked' : 'Active'"
+  [severity]="user.isLocked ? 'danger' : 'success'">
+</p-tag>
+
         </td>
 
-        <td class="flex gap-2">
-          <!-- Lock / Unlock -->
-          <button
-  pButton
-  [icon]="user.lockoutEnd ? 'pi pi-unlock' : 'pi pi-lock'"
-  [severity]="user.lockoutEnd ? 'success' : 'secondary'"
-  size="small"
+       <td class="flex items-center gap-3">
+  <!-- Lock / Unlock -->
+  <button
+  class="p-2 rounded-md hover:bg-gray-100"
+  [title]="user.isLocked ? 'Unlock user' : 'Lock user'"
   (click)="toggleLock(user)"
   [disabled]="isSelf(user)">
+  <i
+    class="pi"
+    [ngClass]="user.isLocked ? 'pi-unlock text-green-600' : 'pi-lock text-gray-600'">
+  </i>
+</button>
+
+<!-- Edit Name -->
+  <button
+  class="p-2 rounded-md hover:bg-blue-50"
+  title="Edit name"
+  (click)="openEditName(user)">
+  <i class="pi pi-pencil text-blue-600"></i>
+</button>
+
+<!-- Edit Email -->
+<button
+  pButton
+  icon="pi pi-envelope"
+  class="p-button-text p-button-sm p-button-info"
+  pTooltip="Edit email"
+  tooltipPosition="top"
+  (click)="openEditEmail(user)">
 </button>
 
 
-          <!-- Delete -->
-          <button
-            pButton
-            icon="pi pi-trash"
-            severity="danger"
-            size="small"
-            (click)="deleteUser(user)"
-            [disabled]="isSelf(user)">
-          </button>
-        </td>
+
+ <!-- <button
+  class="p-2 rounded-md hover:bg-yellow-50"
+  [title]="user.isDeleted ? 'Unsuspend user' : 'Suspend user'"
+  (click)="toggleSuspend(user)"
+  [disabled]="isSelf(user)">
+  <i
+    class="pi"
+    [ngClass]="user.isDeleted ? 'pi-user-plus text-green-600' : 'pi-user-minus text-orange-600'">
+  </i>
+</button> -->
+
+</td>
+
       </tr>
     </ng-template>
 
   </p-table>
+
 </p-card>
+
+<app-admin-edit-user-name-dialog
+  [visible]="showEditNameDialog"
+  [fullName]="selectedUser?.firstName + ' ' + selectedUser?.lastName"
+  (close)="showEditNameDialog = false"
+  (save)="saveUserName($event)">
+</app-admin-edit-user-name-dialog>
+<app-admin-edit-user-email-dialog
+  [user]="selectedUser"
+  [visible]="emailDialogVisible"
+  (visibleChange)="emailDialogVisible = $event">
+</app-admin-edit-user-email-dialog>
+
+
+<p-toast></p-toast>
+
