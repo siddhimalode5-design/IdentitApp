@@ -6,6 +6,7 @@ import { ButtonModule } from 'primeng/button';
 import { PasswordModule } from 'primeng/password';
 import { CommonModule } from '@angular/common';
 import { finalize } from 'rxjs';
+import { AppFloatingConfigurator } from '../../../layout/component/app.floatingconfigurator';
 import { Account } from '../../account';
 
 @Component({
@@ -16,7 +17,8 @@ import { Account } from '../../account';
     InputTextModule,
     ButtonModule,
     PasswordModule,
-    CommonModule
+    CommonModule,
+    AppFloatingConfigurator
   ],
   templateUrl: './register.html',
   styleUrl: './register.css'

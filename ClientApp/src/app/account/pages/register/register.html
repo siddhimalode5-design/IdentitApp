@@ -1,142 +1,145 @@
-<div class="surface-ground flex align-items-center justify-content-center min-h-screen">
-  <div class="surface-card p-4 shadow-2 border-round w-full sm:w-30rem">
+<app-floating-configurator />
 
-    <div class="text-center mb-4">
-      <h2 class="text-900 text-2xl font-medium mb-2">Create Account</h2>
-      <span class="text-600 font-medium">
-        Join our secure identity platform
-      </span>
+<div
+  class="bg-surface-50 dark:bg-surface-950 flex items-center justify-center min-h-screen min-w-screen overflow-hidden"
+>
+  <div class="flex flex-col items-center justify-center">
+
+    <!-- Gradient wrapper -->
+    <div
+      style="
+        border-radius: 56px;
+        padding: 0.3rem;
+        background: linear-gradient(
+          180deg,
+          var(--primary-color) 10%,
+          rgba(33, 150, 243, 0) 30%
+        );
+      "
+    >
+      <!-- Card -->
+      <div
+        class="w-full bg-surface-0 dark:bg-surface-900 py-12 px-8 sm:px-12"
+        style="border-radius: 53px; min-width: 420px; max-width: 520px"
+      >
+
+        <!-- HEADER -->
+        <div class="text-center mb-6">
+          <h2 class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-2">
+            Create Account
+          </h2>
+          <span class="text-muted-color">
+            Join our secure identity platform
+          </span>
+        </div>
+
+        <!-- GLOBAL ERROR -->
+        <div class="p-error mb-3" *ngIf="serverError" [innerHTML]="serverError"></div>
+
+        <!-- FORM -->
+        <form [formGroup]="form" class="flex flex-col gap-4">
+
+          <!-- FIRST NAME -->
+          <div class="flex flex-col gap-1">
+            <label class="font-medium">First Name</label>
+            <input pInputText formControlName="firstName" placeholder="First Name" />
+            <small class="p-error" *ngIf="get('firstName')?.touched && get('firstName')?.errors?.['required']">
+              First name is required.
+            </small>
+            <small class="p-error" *ngIf="get('firstName')?.touched && get('firstName')?.errors?.['minlength']">
+              First name must be at least 3 characters.
+            </small>
+            <small class="p-error" *ngIf="fieldErrors.firstName">
+              {{ fieldErrors.firstName }}
+            </small>
+          </div>
+
+          <!-- LAST NAME -->
+          <div class="flex flex-col gap-1">
+            <label class="font-medium">Last Name</label>
+            <input pInputText formControlName="lastName" placeholder="Last Name" />
+            <small class="p-error" *ngIf="get('lastName')?.touched && get('lastName')?.errors?.['required']">
+              Last name is required.
+            </small>
+            <small class="p-error" *ngIf="get('lastName')?.touched && get('lastName')?.errors?.['minlength']">
+              Last name must be at least 3 characters.
+            </small>
+            <small class="p-error" *ngIf="fieldErrors.lastName">
+              {{ fieldErrors.lastName }}
+            </small>
+          </div>
+
+          <!-- EMAIL -->
+          <div class="flex flex-col gap-1">
+            <label class="font-medium">Email</label>
+            <input pInputText type="email" formControlName="email" placeholder="Email address" />
+            <small class="p-error" *ngIf="get('email')?.touched && get('email')?.errors?.['required']">
+              Email is required.
+            </small>
+            <small class="p-error" *ngIf="fieldErrors.email">
+              {{ fieldErrors.email }}
+            </small>
+          </div>
+
+          <!-- PASSWORD -->
+          <div class="flex flex-col gap-1">
+            <label class="font-medium">Password</label>
+            <p-password
+              formControlName="password"
+              placeholder="Create password"
+              [feedback]="true"
+              [toggleMask]="true"
+              styleClass="w-full"
+              inputStyleClass="w-full"
+            ></p-password>
+            <small class="p-error" *ngIf="get('password')?.touched && get('password')?.errors?.['required']">
+              Password is required.
+            </small>
+            <small class="p-error" *ngIf="get('password')?.touched && get('password')?.errors?.['minlength']">
+              Password must be at least 8 characters.
+            </small>
+          </div>
+
+          <!-- CONFIRM PASSWORD -->
+          <div class="flex flex-col gap-1">
+            <label class="font-medium">Confirm Password</label>
+            <p-password
+              formControlName="confirmPassword"
+              placeholder="Confirm password"
+              [feedback]="false"
+              [toggleMask]="true"
+              styleClass="w-full"
+              inputStyleClass="w-full"
+            ></p-password>
+            <small class="p-error"
+              *ngIf="get('confirmPassword')?.touched &&
+                     get('password')?.value !== get('confirmPassword')?.value">
+              Passwords do not match.
+            </small>
+          </div>
+
+          <!-- SUBMIT -->
+          <p-button
+            type="button"
+            label="Create Account"
+            styleClass="w-full"
+            [loading]="loading"
+            [disabled]="form.invalid || loading"
+            (click)="register()"
+          ></p-button>
+
+          <!-- FOOTER -->
+          <p class="text-center text-600">
+            Already have an account?
+            <a
+              class="font-medium text-primary cursor-pointer ml-1"
+              (click)="goToLogin()"
+            >
+              Login
+            </a>
+          </p>
+        </form>
+      </div>
     </div>
-
-    <!-- Global backend error -->
-    <div class="p-error mb-3" *ngIf="serverError" [innerHTML]="serverError"></div>
-
-    <form [formGroup]="form" class="p-fluid">
-
-      <!-- FIRST NAME -->
-      <div class="field mb-3">
-        <label class="block text-900 mb-2">First Name</label>
-        <input pInputText formControlName="firstName" placeholder="First Name" />
-
-        <small class="p-error"
-  *ngIf="get('firstName')?.touched && get('firstName')?.errors?.['required']">
-  First name is required.
-</small>
-
-<small class="p-error"
-  *ngIf="get('firstName')?.touched && get('firstName')?.errors?.['minlength']">
-  First name must be at least 3 characters.
-</small>
-
-
-        <small class="p-error" *ngIf="fieldErrors.firstName">
-          {{ fieldErrors.firstName }}
-        </small>
-      </div>
-
-      <!-- LAST NAME -->
-      <div class="field mb-3">
-        <label class="block text-900 mb-2">Last Name</label>
-        <input pInputText formControlName="lastName" placeholder="Last Name" />
-
-       <small class="p-error"
-  *ngIf="get('lastName')?.touched && get('lastName')?.errors?.['required']">
-  last name is required.
-</small>
-
-<small class="p-error"
-  *ngIf="get('lastName')?.touched && get('lastName')?.errors?.['minlength']">
-  last name must be at least 3 characters.
-</small>
-
-
-        <small class="p-error" *ngIf="fieldErrors.lastName">
-          {{ fieldErrors.lastName }}
-        </small>
-      </div>
-
-      <!-- EMAIL -->
-      <div class="field mb-3">
-        <label class="block text-900 mb-2">Email</label>
-        <input pInputText type="email" formControlName="email" placeholder="Email address" />
-
-       <small class="p-error"
-  *ngIf="get('email')?.touched && get('email')?.errors?.['required']">
- Email is required.
-</small>
-
-<small class="p-error"
-  *ngIf="get('email')?.touched && get('email')?.errors?.['minlength']">
-  Enter a valid email.
-</small>
-
-
-        <small class="p-error" *ngIf="fieldErrors.email">
-          {{ fieldErrors.email }}
-        </small>
-      </div>
-
-      <!-- PASSWORD -->
-      <div class="field mb-3">
-        <label class="block text-900 mb-2">Password</label>
-        <p-password
-          formControlName="password"
-          placeholder="Create password"
-          [feedback]="true"
-          [toggleMask]="true">
-        </p-password>
-<small class="p-error"
-  *ngIf="get('password')?.touched && get('password')?.errors?.['required']">
- Password is required.
-</small>
-
-        <small class="p-error"
-  *ngIf="get('password')?.touched && get('password')?.errors?.['minlength']">
-  Password must be at least 8 characters.
-</small>
-      </div>
-
-      <!-- CONFIRM PASSWORD -->
-      <div class="field mb-4">
-        <label class="block text-900 mb-2">Confirm Password</label>
-        <p-password
-          formControlName="confirmPassword"
-          placeholder="Confirm password"
-          [feedback]="false"
-          [toggleMask]="true">
-        </p-password>
-
-        <small class="p-error"
-          *ngIf="get('confirmPassword')?.touched &&
-                  (get('password')?.value !== get('confirmPassword')?.value)">
-          Passwords do not match.
-        </small>
-      </div>
-
-      <!-- REGISTER BUTTON -->
-      <button
-        pButton
-        type="button"
-        label="Create Account"
-        class="w-full"
-        (click)="register()"
-        [disabled]="form.invalid || loading">
-      </button>
-
-      <div class="text-center mt-3" *ngIf="loading">
-        <i class="pi pi-spin pi-spinner"></i> Processing...
-      </div>
-
-      <div class="text-center mt-4">
-        <span class="text-600">
-          Already have an account?
-        </span>
-        <a class="font-medium no-underline ml-2 cursor-pointer text-primary hover:underline"
-           (click)="goToLogin()">
-          Login
-        </a>
-      </div>
-
-    </form>
   </div>
 </div>

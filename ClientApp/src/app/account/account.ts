@@ -35,6 +35,12 @@ export class Account {
     return this.http.post(`${environment.apiUrl}/Account/Login`, payload);
 }
 
+changePassword(payload: any) {
+  return this.http.post(
+    `${environment.apiUrl}/Account/change-password`,
+    payload
+  );
+}
 
 
   forgotPassword(email: string): Observable<any> {
