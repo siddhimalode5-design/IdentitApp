@@ -1,0 +1,55 @@
+<p-dialog
+  header="Edit User"
+  [(visible)]="visible"
+  [modal]="true"
+  [closable]="true"
+  [dismissableMask]="true"
+  (onHide)="close()"
+  styleClass="w-full max-w-lg">
+
+  <form [formGroup]="form" class="flex flex-col gap-4">
+
+    <!-- FULL NAME -->
+    <div>
+      <label class="block font-medium mb-1">Full Name</label>
+      <input
+        pInputText
+        formControlName="fullName"
+        placeholder="Enter full name"
+        class="w-full" />
+    </div>
+
+    <!-- EMAIL -->
+    <div>
+      <label class="block font-medium mb-1">Email</label>
+      <input
+        pInputText
+        type="email"
+        formControlName="email"
+        class="w-full" />
+      <small class="text-gray-500">
+        Changing email requires verification.
+      </small>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="flex justify-end gap-2 pt-3">
+      <button
+        pButton
+        label="Cancel"
+        class="p-button-text"
+        type="button"
+        (click)="close()">
+      </button>
+
+      <button
+        pButton
+        label="Save Changes"
+        type="button"
+        [disabled]="!hasChanges()"
+        (click)="save()">
+      </button>
+    </div>
+
+  </form>
+</p-dialog>

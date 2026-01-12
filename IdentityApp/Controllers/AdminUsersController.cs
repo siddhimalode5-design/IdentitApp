@@ -221,6 +221,11 @@ namespace IdentityApp.Controllers
             if (user.Email == dto.NewEmail)
                 return BadRequest("Email is same as current");
 
+            // 🔴 IMPORTANT: Prevent duplicate emails
+            var existingUser = await _userManager.FindByEmailAsync(dto.NewEmail);
+            if (existingUser != null && existingUser.Id != user.Id)
+                return BadRequest("Email already exists");
+
             var token = await _userManager.GenerateChangeEmailTokenAsync(
                 user,
                 dto.NewEmail
@@ -230,31 +235,27 @@ namespace IdentityApp.Controllers
             await _userManager.UpdateAsync(user);
 
             var confirmLink =
-    $"{_config["JWT:ClientUrl"]}/verify-email" +
-    $"?userId={user.Id}" +
-    $"&email={dto.NewEmail}" +
-    $"&token={Uri.EscapeDataString(token)}" +
-    $"&type=change";
+                $"{_config["ApiBaseUrl"]}/api/account/confirm-email-change" +
+                $"?userId={user.Id}" +
+                $"&email={dto.NewEmail}" +
+                $"&token={Uri.EscapeDataString(token)}";
 
 
 
             await _mailService.SendEmailAsync(
-    new EmailSendDto(
-        dto.NewEmail,
-        "Confirm your new email",
-        $"Click here to confirm: {confirmLink}"
-    )
-);
-
+                new EmailSendDto(
+                    dto.NewEmail,
+                    "Confirm your new email",
+                    $"Click here to confirm: {confirmLink}"
+                )
+            );
 
             return Ok(new
             {
                 message = "Verification link sent to new email address"
             });
-
         }
 
-         
 
 
 

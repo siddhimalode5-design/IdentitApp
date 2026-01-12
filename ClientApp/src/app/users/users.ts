@@ -14,7 +14,7 @@ import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { AdminEditUserEmailDialog } from '../users/admin-edit-user-email-dialog/admin-edit-user-email-dialog';
 import { TooltipModule } from 'primeng/tooltip';
-
+import { AdminEditUserDialog } from '../users/admin-edit-user-dialog/admin-edit-user-dialog';
 
 @Component({
   selector: 'app-users',
@@ -28,6 +28,7 @@ import { TooltipModule } from 'primeng/tooltip';
     TagModule,
     AdminEditUserNameDialog,
     AdminEditUserEmailDialog,
+    AdminEditUserDialog,
     ToastModule
   ],
   providers: [MessageService],
@@ -42,8 +43,9 @@ export class Users implements OnInit {
 activeUsers = 0;
 lockedUsers = 0;
 showEditNameDialog = false;
-selectedUser: any;
+selectedUser: any = null;
 emailDialogVisible = false;
+editDialogVisible = false;
 
   constructor(
     private adminUsersService: AdminUsers,
@@ -180,6 +182,22 @@ showSuccess(message: string) {
   });
 }
 
+ 
+ 
+
+openEdit(user: any) {
+  this.selectedUser = user;
+  this.editDialogVisible = true;
+}
+
+onUserUpdated(updatedUser: any) {
+  const index = this.users.findIndex(u => u.id === updatedUser.id);
+
+  if (index !== -1) {
+    this.users[index] = updatedUser;
+    this.users = [...this.users]; // 🔥 trigger change detection
+  }
+}
 
 
 }

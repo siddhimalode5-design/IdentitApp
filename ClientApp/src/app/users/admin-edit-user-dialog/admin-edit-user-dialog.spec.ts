@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { EmailVerifyCallback } from './email-verify-callback';
+import { AdminEditUserDialog } from './admin-edit-user-dialog';
 
-describe('EmailVerifyCallback', () => {
-  let component: EmailVerifyCallback;
-  let fixture: ComponentFixture<EmailVerifyCallback>;
+describe('AdminEditUserDialog', () => {
+  let component: AdminEditUserDialog;
+  let fixture: ComponentFixture<AdminEditUserDialog>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [EmailVerifyCallback]
+      imports: [AdminEditUserDialog]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(EmailVerifyCallback);
+    fixture = TestBed.createComponent(AdminEditUserDialog);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

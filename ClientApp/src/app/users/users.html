@@ -2,9 +2,9 @@
   <h1 class="text-2xl font-semibold text-gray-800">
     Users Management
   </h1>
-  <p class="text-sm text-gray-500">
+  <!-- <p class="text-sm text-gray-500">
     Manage registered users, lock accounts, and control access
-  </p>
+  </p> -->
 </div>
 
 <p-card header="Users Management">
@@ -73,25 +73,40 @@
        <td class="flex items-center gap-3">
   <!-- Lock / Unlock -->
   <button
-  class="p-2 rounded-md hover:bg-gray-100"
-  [title]="user.isLocked ? 'Unlock user' : 'Lock user'"
+  class="p-2 rounded-md hover:bg-gray-100 disabled:opacity-50"
+  [pTooltip]="
+    isSelf(user)
+      ? 'You cannot lock your own account'
+      : user.isLocked
+        ? 'Unlock user'
+        : 'Lock user'
+  "
+  tooltipPosition="top"
+  [disabled]="isSelf(user)"
   (click)="toggleLock(user)"
-  [disabled]="isSelf(user)">
+>
   <i
     class="pi"
-    [ngClass]="user.isLocked ? 'pi-unlock text-green-600' : 'pi-lock text-gray-600'">
-  </i>
+    [ngClass]="
+      user.isLocked
+        ? 'pi-unlock text-green-600'
+        : 'pi-lock text-gray-600'
+    "
+  ></i>
 </button>
 
-<!-- Edit Name -->
-  <button
-  class="p-2 rounded-md hover:bg-blue-50"
-  title="Edit name"
-  (click)="openEditName(user)">
+
+
+<button
+  class="p-2 rounded-md hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed"
+  [pTooltip]="isSelf(user) ? 'You cannot edit your own account' : 'Edit user details'"
+  tooltipPosition="top"
+  [disabled]="isSelf(user)"
+  (click)="openEdit(user)">
   <i class="pi pi-pencil text-blue-600"></i>
 </button>
 
-<!-- Edit Email -->
+<!-- Edit Email
 <button
   pButton
   icon="pi pi-envelope"
@@ -99,7 +114,7 @@
   pTooltip="Edit email"
   tooltipPosition="top"
   (click)="openEditEmail(user)">
-</button>
+</button> -->
 
 
 
@@ -123,7 +138,7 @@
 
 </p-card>
 
-<app-admin-edit-user-name-dialog
+<!-- <app-admin-edit-user-name-dialog
   [visible]="showEditNameDialog"
   [fullName]="selectedUser?.firstName + ' ' + selectedUser?.lastName"
   (close)="showEditNameDialog = false"
@@ -133,7 +148,14 @@
   [user]="selectedUser"
   [visible]="emailDialogVisible"
   (visibleChange)="emailDialogVisible = $event">
-</app-admin-edit-user-email-dialog>
+</app-admin-edit-user-email-dialog> -->
+<app-admin-edit-user-dialog
+  [visible]="editDialogVisible"
+  (visibleChange)="editDialogVisible = $event"
+  [user]="selectedUser"
+  (userUpdated)="onUserUpdated($event)">
+</app-admin-edit-user-dialog>
+
 
 
 <p-toast></p-toast>

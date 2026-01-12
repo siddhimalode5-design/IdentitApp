@@ -198,27 +198,30 @@ namespace IdentityApp.Controllers
                 return Redirect($"{frontendUrl}/email-verification-failed");
             }
         }
-
-        [HttpPost("confirm-email-change")]
-        public async Task<IActionResult> ConfirmEmailChange(
-    string userId,
-    string email,
-    string token)
+        [HttpGet("confirm-email-change")]
+        public async Task<IActionResult> ConfirmEmailChange(string userId, string email, string token)
         {
+            var frontendUrl = _config["JWT:ClientUrl"]; // e.g., https://localhost:4200
+
+            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(email) || string.IsNullOrEmpty(token))
+                return Redirect($"{frontendUrl}/email-verification-failed");
+
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
-                return NotFound();
+                return Redirect($"{frontendUrl}/email-verification-failed");
 
             var result = await _userManager.ChangeEmailAsync(user, email, token);
+
             if (!result.Succeeded)
-                return BadRequest(result.Errors);
+                return Redirect($"{frontendUrl}/email-verification-failed");
 
             user.EmailConfirmed = true;
             user.UserName = email;
             await _userManager.UpdateAsync(user);
 
-            return Ok();
+            return Redirect($"{frontendUrl}/email-verified");
         }
+
 
 
 
