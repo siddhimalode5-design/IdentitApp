@@ -40,9 +40,16 @@ export class AppMenu implements OnInit {
                         icon: 'pi pi-users',
                         routerLink: ['/users'],
                         visible: this.auth.user()?.roles?.includes('Admin')
-                    }
+                    },
+                    {
+      label: 'Stocks',
+      icon: 'pi pi-chart-line',
+      routerLink: ['/stocks'],
+      visible: this.auth.user()?.roles?.includes('Admin')
+    }
                 ]
             },
+            
             {
                 label: 'Settings',
                 items: [
@@ -52,7 +59,8 @@ export class AppMenu implements OnInit {
                         routerLink: ['/settings']
                     }
                 ]
-            }
+            },
+            
         ];
     }
 }

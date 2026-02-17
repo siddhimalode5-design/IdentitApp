@@ -1,0 +1,142 @@
+<div class="page-container">
+
+  <h2 class="mb-4">Stocks</h2>
+
+  <p-card>
+
+    <!-- Top Toolbar -->
+    <div class="flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+
+      <!-- Left Side -->
+      <div class="flex align-items-center gap-2">
+
+        <button
+          pButton
+          icon="pi pi-filter"
+          label="Filters"
+          [class.p-button-success]="dateRange"
+          class="p-button-outlined"
+          (click)="op.toggle($event)">
+        </button>
+
+      </div>
+
+      <!-- Right Side Search -->
+      <div class="p-input-icon-left w-full md:w-20rem">
+        <i class="pi pi-search"></i>
+        <input
+          pInputText
+          type="text"
+          placeholder="Search by Symbol"
+          [(ngModel)]="symbol"
+          (keyup.enter)="applyFilters()"
+          class="w-full" />
+      </div>
+
+    </div>
+
+
+    <!-- Active Filter Chips -->
+    <div class="mb-3 flex gap-2 flex-wrap" *ngIf="dateRange">
+
+      <p-chip
+        [label]="'Date: ' + (dateRange[0] | date:'yyyy-MM-dd') + ' → ' + (dateRange[1] | date:'yyyy-MM-dd')"
+        removable="true"
+        (onRemove)="clearDateFilter()">
+      </p-chip>
+
+    </div>
+
+
+    <!-- Advanced Filter Popover -->
+    <p-popover #op>
+
+      <div class="flex flex-column gap-3" style="min-width:280px">
+
+        <div>
+          <label class="block mb-2 font-medium">Date Range</label>
+
+          <p-datePicker
+            [(ngModel)]="dateRange"
+            selectionMode="range"
+            [maxDate]="maxDate"
+            dateFormat="yy-mm-dd"
+            class="w-full">
+          </p-datePicker>
+        </div>
+
+        <div class="flex justify-content-end gap-2 mt-3">
+          <button
+            pButton
+            label="Clear"
+            class="p-button-text"
+            (click)="clearFilters(); op.hide()">
+          </button>
+
+          <button
+            pButton
+            label="Apply"
+            class="p-button-success"
+            (click)="applyFilters(); op.hide()">
+          </button>
+        </div>
+
+      </div>
+
+    </p-popover>
+
+
+    <!-- Table -->
+    <p-table
+      #table
+      [value]="stocks"
+      [lazy]="true"
+      (onLazyLoad)="loadStocksLazy($event)"
+      [paginator]="true"
+      [rows]="pageSize"
+      [totalRecords]="totalRecords"
+      [loading]="loading"
+      [rowsPerPageOptions]="[5,10,20,50]"
+      responsiveLayout="scroll"
+      class="p-datatable-sm">
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th pSortableColumn="symbol">
+            Symbol
+            <p-sortIcon field="symbol"></p-sortIcon>
+          </th>
+          <th>Date</th>
+          <th>Open</th>
+          <th>High</th>
+          <th>Low</th>
+          <th>Close</th>
+          <th>Volume</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-s>
+        <tr>
+          <td class="font-semibold">{{ s.symbol }}</td>
+          <td>{{ s.date | date:'yyyy-MM-dd HH:mm' }}</td>
+          <td>{{ s.open }}</td>
+          <td>{{ s.high }}</td>
+          <td>{{ s.low }}</td>
+          <td>{{ s.close }}</td>
+          <td>{{ s.volume }}</td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="7" class="text-center py-5">
+            No records found
+          </td>
+        </tr>
+      </ng-template>
+
+    </p-table>
+
+  </p-card>
+
+</div>

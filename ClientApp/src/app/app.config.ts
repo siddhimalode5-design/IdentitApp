@@ -21,6 +21,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes, withInMemoryScrolling({ anchorScrolling: 'enabled', scrollPositionRestoration: 'enabled' }), withEnabledBlockingInitialNavigation()),
      provideAnimationsAsync(),
        provideHttpClient(withFetch()),
+       provideHttpClient(),
                 providePrimeNG({ theme: { preset: Aura, options: { darkModeSelector: '.app-dark' } } })
 
          

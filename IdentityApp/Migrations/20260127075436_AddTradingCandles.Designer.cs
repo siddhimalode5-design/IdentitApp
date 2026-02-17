@@ -4,6 +4,7 @@ using IdentityApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IdentityApp.Migrations
 {
     [DbContext(typeof(Context))]
-    partial class ContextModelSnapshot : ModelSnapshot
+    [Migration("20260127075436_AddTradingCandles")]
+    partial class AddTradingCandles
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -148,6 +151,9 @@ namespace IdentityApp.Migrations
                         .HasPrecision(18, 4)
                         .HasColumnType("decimal(18,4)");
 
+                    b.Property<string>("HollowCandleType")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<decimal>("LowPrice")
                         .HasPrecision(18, 4)
                         .HasColumnType("decimal(18,4)");
@@ -164,6 +170,9 @@ namespace IdentityApp.Migrations
 
                     b.Property<long>("Volume")
                         .HasColumnType("bigint");
+
+                    b.Property<string>("VolumeCandle")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 

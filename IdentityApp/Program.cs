@@ -1,5 +1,8 @@
 ﻿using IdentityApp.Data;
 using IdentityApp.Models;
+using IdentityApp.Modules.Trading.Interfaces;
+using IdentityApp.Modules.Trading.Repositories;
+using IdentityApp.Modules.Trading.Services;
 using IdentityApp.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Facebook;
@@ -14,7 +17,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
- 
+
 
 using System;
 using System.Linq;
@@ -30,6 +33,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddHttpClient();
+
+
 builder.Services.AddSwaggerGen();
 
 
@@ -40,6 +46,8 @@ builder.Services.AddDbContext<Context>(options =>
 builder.Services.AddScoped<JWTService>();
 
 builder.Services.AddScoped<IMailService, EmailService>();
+builder.Services.AddScoped<IStockOhlcRepository, StockOhlcRepository>();
+builder.Services.AddScoped<IStockOhlcService, StockOhlcService>();
 
 
 

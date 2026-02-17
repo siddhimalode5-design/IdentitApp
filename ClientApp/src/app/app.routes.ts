@@ -57,6 +57,12 @@ export const routes: Routes = [
         canActivate: [adminGuardGuard]
       },
       {
+  path: 'stocks',
+  loadComponent: () =>
+    import('./stocks/stocks').then(m => m.Stocks),
+  canActivate: [adminGuardGuard]
+},
+      {
         path: 'settings',
         loadComponent: () =>
           import('./account/pages/settings/settings')
